@@ -96,7 +96,8 @@ public class SecurityConfig {
             .requestMatchers(
                 "/api/cart/**",
                 "/api/orders/**",
-                "/api/notifications/**"
+                "/api/notifications/**",
+                "/api/wishlist/**"
             ).hasRole("USER")
 
             .anyRequest()
