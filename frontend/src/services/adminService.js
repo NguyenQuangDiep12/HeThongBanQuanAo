@@ -3,6 +3,12 @@ import { api } from "../api";
 export const fetchAdminProducts = () => api("/admin/products");
 export const fetchAdminCategories = () => api("/admin/categories");
 export const fetchAdminOrders = () => api("/admin/orders");
+export const fetchAdminUsers = () => api("/admin/users");
+export const setAdminUserActive = (id, active) =>
+  api(`/admin/users/${id}/active`, {
+    method: "PUT",
+    body: JSON.stringify({ active }),
+  });
 
 export const saveAdminCategory = (id, data) =>
   api(id == null ? "/admin/categories" : "/admin/categories/" + id, {

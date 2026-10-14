@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public final class ProductSpecifications {
 
@@ -118,10 +119,17 @@ public final class ProductSpecifications {
                 '\\'
         );
 
+        Predicate categoryPredicate = criteriaBuilder.like(
+                criteriaBuilder.lower(root.get("category").get("name")),
+                searchTerm,
+                '\\'
+        );
+
         predicates.add(
                 criteriaBuilder.or(
                         namePredicate,
-                        descriptionPredicate
+                        descriptionPredicate,
+                        categoryPredicate
                 )
         );
     }
@@ -141,7 +149,7 @@ public final class ProductSpecifications {
                         criteriaBuilder.lower(
                                 root.get("category").get("name")
                         ),
-                        category.trim().toLowerCase()
+                        category.trim().toLowerCase(Locale.ROOT)
                 )
         );
     }
@@ -297,7 +305,7 @@ public final class ProductSpecifications {
                         criteriaBuilder.lower(
                                 variant.get("size")
                         ),
-                        size.trim().toLowerCase()
+                        size.trim().toLowerCase(Locale.ROOT)
                 )
         );
     }
@@ -317,7 +325,7 @@ public final class ProductSpecifications {
                         criteriaBuilder.lower(
                                 variant.get("color")
                         ),
-                        color.trim().toLowerCase()
+                        color.trim().toLowerCase(Locale.ROOT)
                 )
         );
     }
@@ -354,7 +362,8 @@ public final class ProductSpecifications {
         return "%"
                 + keyword
                     .trim()
-                    .toLowerCase()
+                    .toLowerCase(Locale.ROOT)
+                    .replace("\\", "\\\\")
                     .replace("%", "\\%")
                     .replace("_", "\\_")
                 + "%";

@@ -10,6 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+
 @Component
 public class AdminBootstrap implements ApplicationRunner {
 
@@ -60,10 +63,16 @@ public class AdminBootstrap implements ApplicationRunner {
                     "Cần cấu hình đồng thời ADMIN_EMAIL và ADMIN_PASSWORD để khởi tạo tài khoản quản trị."
             );
         }
+        int passwordBytes = adminPassword.getBytes(StandardCharsets.UTF_8).length;
+        if (adminPassword.length() < 8 || passwordBytes > 72) {
+            throw new IllegalStateException(
+                    "ADMIN_PASSWORD phải có ít nhất 8 ký tự và không vượt quá 72 byte UTF-8."
+            );
+        }
     }
 
     private String normalizeEmail(String email) {
-        return email.trim().toLowerCase();
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 
     private void validateExistingUser(User user) {

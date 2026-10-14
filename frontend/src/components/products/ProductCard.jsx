@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { money } from '../../api';
 import { pics } from '../../shared/media.js';
+import { useWishlist } from '../../features/account/WishlistContext.jsx';
 
 function isNewProduct(createdAt) {
   if (!createdAt) {
@@ -22,9 +23,11 @@ function isNewProduct(createdAt) {
 
 export function ProductCard({ p }) {
   const isNew = isNewProduct(p.createdAt);
+  const { ids, toggle } = useWishlist();
+  const wished = ids.has(String(p.id));
 
   return (
-    <article className="group">
+    <article className="group relative">
       <Link
         to={'/san-pham/' + p.id}
         className="relative block aspect-[.82] overflow-hidden rounded-2xl bg-slate-100"
@@ -40,10 +43,16 @@ export function ProductCard({ p }) {
             Mới về
           </span>
         )}
-        <span className="absolute right-3 top-3 rounded-full bg-white/90 p-2">
-          <Heart size={15} />
-        </span>
       </Link>
+      <button
+        type="button"
+        onClick={() => toggle(p.id)}
+        aria-label={wished ? `Xóa ${p.name} khỏi yêu thích` : `Thêm ${p.name} vào yêu thích`}
+        aria-pressed={wished}
+        className="absolute right-3 top-3 rounded-full bg-white/90 p-2 text-slate-700 shadow-sm transition hover:text-rose-600"
+      >
+        <Heart size={15} className={wished ? "fill-rose-100 text-rose-600" : ""} />
+      </button>
       <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
         {p.category || 'Thời trang'}
       </p>

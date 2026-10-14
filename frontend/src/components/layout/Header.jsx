@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Bell,
+  Heart,
   LogOut,
   Menu,
   Search,
@@ -88,6 +89,15 @@ export function Header({ user, count, logout }) {
                 <Bell size={18} />
               </Link>
             )}
+            {user?.role === "USER" && (
+              <Link
+                to="/yeu-thich"
+                aria-label="Sản phẩm yêu thích"
+                className="hidden rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 hover:text-rose-600 sm:block"
+              >
+                <Heart size={18} />
+              </Link>
+            )}
             {user?.role !== "ADMIN" && (
               <Link
                 to="/gio-hang"
@@ -131,6 +141,7 @@ export function Header({ user, count, logout }) {
             <div className="grid gap-2 text-sm font-bold">
               <Link to="/">Trang chủ</Link>
               <Link to="/san-pham">Tất cả sản phẩm</Link>
+              {user?.role === "USER" && <Link to="/yeu-thich">Sản phẩm yêu thích</Link>}
               <Link to={user?.role === "ADMIN" ? "/admin" : user ? "/tai-khoan" : "/dang-nhap"}>
                 {user?.role === "ADMIN" ? "Quản trị" : "Tài khoản"}
               </Link>

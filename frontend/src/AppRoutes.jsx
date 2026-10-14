@@ -7,6 +7,7 @@ import { AdminHome } from './features/admin/AdminOverviewPage.jsx';
 import { AdminProducts } from './features/admin/AdminProductsPage.jsx';
 import { AdminCategories } from './features/admin/AdminCategoriesPage.jsx';
 import { AdminOrders } from './features/admin/AdminOrdersPage.jsx';
+import { AdminUsers } from './features/admin/AdminUsersPage.jsx';
 import { Home } from './features/home/HomePage.jsx';
 import { Catalog } from './features/catalog/CatalogPage.jsx';
 import { Detail } from './features/products/ProductDetailPage.jsx';
@@ -17,6 +18,7 @@ import { Orders } from './features/orders/OrdersPage.jsx';
 import { OrderDetail } from './features/orders/OrderDetailPage.jsx';
 import { Notifications } from './features/notifications/NotificationsPage.jsx';
 import { Account } from './features/account/AccountPage.jsx';
+import { Wishlist } from './features/account/WishlistPage.jsx';
 
 function AdminAccess({ user, children, to = '/' }) {
   if (!user) {
@@ -86,6 +88,7 @@ export function AppRoutes({ user, setUser, setToast, refreshCart, logout }) {
       <Route path="/don-hang" element={<CustomerAccess user={user} to="/don-hang"><Orders /></CustomerAccess>} />
       <Route path="/don-hang/:id" element={<CustomerAccess user={user} to={window.location.pathname}><OrderDetail setToast={setToast} /></CustomerAccess>} />
       <Route path="/thong-bao" element={<CustomerAccess user={user} to="/thong-bao"><Notifications setToast={setToast} /></CustomerAccess>} />
+      <Route path="/yeu-thich" element={<CustomerAccess user={user} to="/yeu-thich"><Wishlist /></CustomerAccess>} />
       <Route
         path="/tai-khoan"
         element={<CustomerAccess user={user} to="/tai-khoan"><Account user={user} logout={logout} /></CustomerAccess>}
@@ -94,6 +97,7 @@ export function AppRoutes({ user, setUser, setToast, refreshCart, logout }) {
       <Route path="/admin/danh-muc" element={<AdminAccess user={user}><AdminCategories setToast={setToast} /></AdminAccess>} />
       <Route path="/admin/san-pham" element={<AdminAccess user={user}><AdminProducts setToast={setToast} /></AdminAccess>} />
       <Route path="/admin/don-hang" element={<AdminAccess user={user}><AdminOrders setToast={setToast} /></AdminAccess>} />
+      <Route path="/admin/nguoi-dung" element={<AdminAccess user={user}><AdminUsers setToast={setToast} /></AdminAccess>} />
       <Route
         path="*"
         element={

@@ -1,104 +1,60 @@
-# Hệ thống bán quần áo BLUE THREAD
+# BLUE THREAD
 
-Ứng dụng thương mại điện tử bán quần áo, gồm backend cung cấp REST API và frontend React phục vụ khách hàng cùng nhân viên quản trị. Hai phần được phát triển và chạy độc lập; frontend lấy dữ liệu từ backend qua API.
+Ứng dụng bán quần áo gồm frontend React và backend Spring Boot. Frontend gọi REST API qua `/api`; backend lưu dữ liệu trong MySQL.
 
-## Mục tiêu
-
-- Cho phép khách hàng tìm, lọc và xem thông tin sản phẩm quần áo.
-- Hỗ trợ chọn kích cỡ, màu sắc, quản lý giỏ hàng và tạo đơn hàng.
-- Cung cấp giao diện quản trị để cập nhật sản phẩm, biến thể, tồn kho và xử lý đơn.
-- Lưu dữ liệu bằng MySQL; quản lý thay đổi cấu trúc cơ sở dữ liệu bằng Flyway.
-
-## Cấu trúc dự án
+## Cấu trúc
 
 ```text
 C:\DAAAN\shopee
-├── shopee/                         # Backend Spring Boot
-│   ├── src/main/java/              # Controller, service, model, repository
-│   ├── src/main/resources/
-│   │   ├── application.properties  # Cấu hình chạy backend và MySQL
-│   │   └── db/migration/           # Flyway migrations
-│   ├── run-backend.ps1             # Chạy backend riêng
-│   ├── clean-backend.ps1           # Clean backend
-│   └── build-backend.ps1           # Clean và build backend
-└── frontend/                       # Frontend React + Tailwind CSS
-    ├── src/                        # Giao diện, routes và API client
-    ├── public/                     # Tài nguyên tĩnh như favicon
-    └── package.json                # Lệnh dev, clean, build frontend
+├── frontend/       # React, Vite, giao diện khách hàng và quản trị
+├── shopee/         # Spring Boot API, cấu hình và cơ sở dữ liệu
+└── docs/           # Tài liệu thiết kế, sơ đồ và đánh giá bảo mật
 ```
 
-## Công nghệ
+## Chạy dự án
 
-| Thành phần | Công nghệ |
-| --- | --- |
-| Backend | Java 21, Spring Boot, Spring Security, Spring Data JPA |
-| Cơ sở dữ liệu | MySQL 8, Flyway |
-| Xác thực | JWT; phân quyền USER và ADMIN |
-| Frontend | React, Vite, Tailwind CSS, React Router |
-| Giao tiếp | REST API, dữ liệu JSON; API prefix `/api` |
-
-## Chức năng khách hàng
-
-- Trang chủ và danh sách sản phẩm lấy dữ liệu động từ backend.
-- Tìm kiếm theo từ khóa; lọc theo danh mục, kích cỡ, màu sắc, giá và tình trạng còn hàng.
-- Sắp xếp và phân trang danh sách sản phẩm.
-- Xem chi tiết, mô tả, giá và tồn kho của từng biến thể sản phẩm.
-- Đăng ký, đăng nhập và xác thực bằng JWT.
-- Thêm sản phẩm vào giỏ, điều chỉnh số lượng hoặc xóa khỏi giỏ.
-- Đặt hàng với địa chỉ, số điện thoại và phương thức COD hoặc chuyển khoản.
-- Xem đơn hàng, trạng thái xử lý và thông báo liên quan.
-
-## Chức năng quản trị
-
-- Xem tổng quan sản phẩm và đơn hàng từ các API hiện có.
-- Tạo, cập nhật hoặc ẩn sản phẩm.
-- Thêm biến thể theo kích cỡ/màu sắc; cập nhật giá và tồn kho.
-- Xem đơn hàng đang chờ; xác nhận hoặc hủy đơn.
-- Khi ADMIN hủy đơn PENDING, backend hoàn lại lượng tồn kho đã giữ cho đơn đó.
-
-## Cấu hình và dữ liệu
-
-Backend đọc cấu hình từ [application.properties](</C:/DAAAN/shopee/shopee/src/main/resources/application.properties>). Cấu hình hiện tại sử dụng MySQL tại `localhost:3306`, database `clotherwebsite`. Hãy khởi động MySQL và bảo đảm database tồn tại trước khi chạy backend. Flyway sẽ tạo/cập nhật bảng khi ứng dụng khởi động.
-
-Frontend chạy Vite tại `localhost:5173` và proxy đường dẫn `/api` tới backend `localhost:8080`. Vì vậy, có thể khởi động frontend riêng, nhưng các chức năng tải dữ liệu từ API cần backend hoạt động.
-
-## Chạy hai phần riêng biệt
-
-Mở PowerShell thứ nhất cho backend:
+Cần Java 21, MySQL 8, Node.js và pnpm. Tạo database `clotherwebsite`, sau đó mở PowerShell thứ nhất để chạy backend:
 
 ```powershell
 cd C:\DAAAN\shopee\shopee
-.\run-backend.ps1
+$env:DB_PASSWORD = "<mật khẩu MySQL>"
+$env:JWT_SECRET = "<chuỗi bí mật ngẫu nhiên tối thiểu 32 ký tự>"
+$env:ADMIN_PASSWORD = "<mật khẩu quản trị>"
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"
 ```
 
-Mở PowerShell thứ hai cho frontend:
+Mở PowerShell thứ hai để chạy frontend:
 
 ```powershell
 cd C:\DAAAN\shopee\frontend
-npm install    # chỉ cần ở lần đầu hoặc khi dependencies thay đổi
-npm run dev
+pnpm install
+pnpm dev
 ```
 
-Mở giao diện tại [http://localhost:5173](http://localhost:5173). Backend API ở [http://localhost:8080](http://localhost:8080). Dừng mỗi ứng dụng bằng `Ctrl+C` trong terminal tương ứng.
+Frontend chạy tại [http://localhost:5173](http://localhost:5173) và chuyển tiếp `/api` đến backend tại [http://localhost:8082](http://localhost:8082). Backend dùng cấu hình profile `dev` trong `shopee/src/main/resources/application-dev.properties`; chỉ dùng profile này với cơ sở dữ liệu phát triển. Xem [hướng dẫn backend](shopee/src/BACKEND_SETUP.md) để biết cấu hình, seed dữ liệu và các endpoint.
 
-### Clean và build độc lập
-
-Trong thư mục backend:
-
-Trong thư mục frontend:
+## Build
 
 ```powershell
-npm run clean
-npm run build
+cd C:\DAAAN\shopee\shopee
+.\mvnw.cmd clean package -DskipTests
+
+cd C:\DAAAN\shopee\frontend
+pnpm run build
 ```
 
-Build backend hiện bỏ qua test bằng `-DskipTests`; test có thể chạy riêng bằng Maven nếu cần.
+## Chức năng
 
-## Tài liệu chi tiết
+- Tìm kiếm, lọc và xem sản phẩm, biến thể, tồn kho và đánh giá.
+- Đăng ký, đăng nhập, giỏ hàng, thanh toán COD/chuyển khoản, đơn hàng và thông báo.
+- Danh sách yêu thích của khách hàng.
+- Quản trị sản phẩm, danh mục, biến thể, đơn hàng, người dùng, tài khoản ngân hàng và thống kê.
 
-- [Hướng dẫn backend](</C:/DAAAN/shopee/shopee/BACKEND_RUN.md>)
-- [Hướng dẫn frontend](</C:/DAAAN/shopee/frontend/README.md>)
+## Tài liệu
 
-## Phạm vi hiện tại
-
-Ứng dụng chưa tích hợp cổng thanh toán trực tuyến, upload ảnh trực tiếp, quên mật khẩu, danh sách yêu thích, vận chuyển/tracking hoặc báo cáo doanh thu chuyên sâu. Các phần này cần endpoint và nghiệp vụ backend bổ sung trước khi sử dụng.
+- [Tổng quan kiến trúc](docs/software-design/01-software-architecture.md)
+- [Thiết kế cơ sở dữ liệu](docs/software-design/03-database-design.md)
+- [Thiết kế API](docs/software-design/04-api-design.md)
+- [Danh mục kiểm thử](docs/software-design/05-unit-test-inventory.md)
+- [Tài liệu thiết kế và kiểm thử cập nhật](docs/software-design/Shopee-Software-Design-Unit-Testing-Updated-2026-10-15.docx)
+- [Đánh giá bảo mật](docs/security/SECURITY-REVIEW-AND-REMEDIATION-2026-10.md)

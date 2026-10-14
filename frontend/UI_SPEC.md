@@ -106,7 +106,7 @@
 
 ## 5. API và cấu hình chạy
 
-- Vite proxy /api tới http://localhost:8080 để chạy local; không cần CORS khi cùng dùng proxy.
+- Vite proxy /api tới http://localhost:8082 để chạy local; không cần CORS khi cùng dùng proxy.
 - Khi triển khai frontend/backend khác origin, cấu hình CORS và VITE_API_BASE_URL theo domain môi trường.
 - Chạy backend trước, sau đó pnpm install và pnpm dev; mở http://localhost:5173.
 - Backend/API contract là nguồn dữ liệu và quyền truy cập chính thức.

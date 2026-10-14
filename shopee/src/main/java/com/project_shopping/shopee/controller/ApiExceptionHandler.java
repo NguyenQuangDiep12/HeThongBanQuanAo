@@ -1,16 +1,22 @@
 package com.project_shopping.shopee.controller;
 
 import com.project_shopping.shopee.dto.ApiDtos.ErrorResponse;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
 import java.util.Map;
@@ -63,7 +69,7 @@ public class ApiExceptionHandler {
         String message = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(error -> validationMessage(error.getField(), error.getDefaultMessage()))
+                .map(this::validationMessage)
                 .findFirst()
                 .orElse("Dữ liệu gửi lên chưa hợp lệ. Vui lòng kiểm tra lại.");
 
@@ -91,6 +97,42 @@ public class ApiExceptionHandler {
                 HttpStatus.CONFLICT,
                 "Dữ liệu không thể lưu do bị trùng hoặc vi phạm ràng buộc. Vui lòng kiểm tra lại."
         );
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(
+            NoResourceFoundException exception) {
+        return createErrorResponse(HttpStatus.NOT_FOUND, "Không tìm thấy đường dẫn yêu cầu.");
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(
+            HttpRequestMethodNotSupportedException exception) {
+        return createErrorResponse(HttpStatus.METHOD_NOT_ALLOWED,
+                "Phương thức HTTP không được hỗ trợ cho đường dẫn này.");
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMediaTypeNotSupported(
+            HttpMediaTypeNotSupportedException exception) {
+        return createErrorResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                "Định dạng nội dung gửi lên không được hỗ trợ.");
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    public ResponseEntity<ErrorResponse> handleMediaTypeNotAcceptable(
+            HttpMediaTypeNotAcceptableException exception) {
+        return createErrorResponse(HttpStatus.NOT_ACCEPTABLE,
+                "Định dạng phản hồi được yêu cầu không được hỗ trợ.");
+    }
+
+    @ExceptionHandler(ConcurrencyFailureException.class)
+    public ResponseEntity<ErrorResponse> handleConcurrencyFailure(
+            ConcurrencyFailureException exception) {
+        LOGGER.log(System.Logger.Level.WARNING,
+                "Yêu cầu không thể hoàn tất do tranh chấp khóa cơ sở dữ liệu.", exception);
+        return createErrorResponse(HttpStatus.SERVICE_UNAVAILABLE,
+                "Dữ liệu đang được cập nhật bởi yêu cầu khác. Vui lòng thử lại.");
     }
 
     @ExceptionHandler(Exception.class)
@@ -130,17 +172,41 @@ public class ApiExceptionHandler {
                 .body(errorResponse);
     }
 
-    private String validationMessage(String field, String defaultMessage) {
-        String label = fieldLabel(field);
-        String constraint = switch (defaultMessage == null ? "" : defaultMessage) {
-            case "must not be blank", "must not be null" -> "không được để trống";
-            case "must be greater than 0" -> "phải lớn hơn 0";
-            case "must be greater than or equal to 0" -> "phải bằng hoặc lớn hơn 0";
-            case "must be greater than or equal to 0.01" -> "phải lớn hơn 0";
-            case "must be a well-formed email address" -> "không đúng định dạng email";
-            default -> translateSizeMessage(defaultMessage);
+    private String validationMessage(FieldError error) {
+        String label = fieldLabel(error.getField());
+        String constraint = switch (error.getCode() == null ? "" : error.getCode()) {
+            case "NotBlank", "NotNull" -> "không được để trống";
+            case "Positive" -> "phải lớn hơn 0";
+            case "PositiveOrZero" -> "phải bằng hoặc lớn hơn 0";
+            case "DecimalMin" -> "phải đạt giá trị tối thiểu cho phép";
+            case "DecimalMax", "Max" -> "vượt quá giá trị tối đa cho phép";
+            case "Email" -> "không đúng định dạng email";
+            case "WholeVndAmount" -> "phải là số nguyên VND";
+            case "Size" -> sizeConstraint(error.getArguments());
+            case "Digits" -> "không đúng số chữ số cho phép";
+            default -> "chưa hợp lệ";
         };
         return label + " " + constraint + ".";
+    }
+
+    private String sizeConstraint(Object[] arguments) {
+        if (arguments == null || arguments.length < 3
+                || !(arguments[1] instanceof Number maxValue)
+                || !(arguments[2] instanceof Number minValue)) {
+            return "có độ dài không hợp lệ";
+        }
+        int min = minValue.intValue();
+        int max = maxValue.intValue();
+        if (min > 0 && max < Integer.MAX_VALUE) {
+            return "phải có từ " + min + " đến " + max + " ký tự";
+        }
+        if (min > 0) {
+            return "phải có ít nhất " + min + " ký tự";
+        }
+        if (max < Integer.MAX_VALUE) {
+            return "không được vượt quá " + max + " ký tự";
+        }
+        return "có độ dài không hợp lệ";
     }
 
     private String fieldLabel(String field) {
@@ -160,7 +226,12 @@ public class ApiExceptionHandler {
                 Map.entry("variantId", "phân loại sản phẩm"),
                 Map.entry("shippingAddress", "địa chỉ giao hàng"),
                 Map.entry("paymentMethod", "phương thức thanh toán"),
-                Map.entry("description", "mô tả")
+                Map.entry("description", "mô tả"),
+                Map.entry("bankCode", "mã ngân hàng"),
+                Map.entry("bankName", "tên ngân hàng"),
+                Map.entry("accountNo", "số tài khoản"),
+                Map.entry("accountName", "tên chủ tài khoản"),
+                Map.entry("qrTemplate", "mẫu QR")
         );
         Map<String, String> parameterNames = Map.of(
                 "page", "số trang",
@@ -178,20 +249,17 @@ public class ApiExceptionHandler {
         );
     }
 
-    private String translateSizeMessage(String defaultMessage) {
-        if (defaultMessage != null && defaultMessage.startsWith("size must be between ")) {
-            return "vượt quá độ dài cho phép";
-        }
-        return "chưa hợp lệ";
-    }
-
     public static String localizedStatus(HttpStatus status) {
         return switch (status) {
             case BAD_REQUEST -> "Yêu cầu không hợp lệ";
             case UNAUTHORIZED -> "Chưa đăng nhập";
             case FORBIDDEN -> "Không có quyền truy cập";
             case NOT_FOUND -> "Không tìm thấy dữ liệu";
+            case METHOD_NOT_ALLOWED -> "Phương thức không được hỗ trợ";
+            case NOT_ACCEPTABLE -> "Định dạng phản hồi không được hỗ trợ";
+            case UNSUPPORTED_MEDIA_TYPE -> "Định dạng nội dung không được hỗ trợ";
             case CONFLICT -> "Dữ liệu bị xung đột";
+            case SERVICE_UNAVAILABLE -> "Dịch vụ tạm thời không khả dụng";
             case INTERNAL_SERVER_ERROR -> "Lỗi hệ thống";
             default -> "Yêu cầu không thể xử lý";
         };

@@ -6,6 +6,7 @@ import {
   Package,
   ShieldCheck,
   ShoppingBag,
+  UsersRound,
 } from "lucide-react";
 import { cx } from "../../shared/uiStyles.js";
 
@@ -48,6 +49,7 @@ export function AdminLayout({ children }) {
                 ["Danh mục", "/admin/danh-muc", Layers3],
                 ["Sản phẩm", "/admin/san-pham", ShoppingBag],
                 ["Đơn hàng", "/admin/don-hang", Package],
+                ["Người dùng", "/admin/nguoi-dung", UsersRound],
               ].map(([title, to, Icon]) => (
                 <NavLink
                   end={to === "/admin"}

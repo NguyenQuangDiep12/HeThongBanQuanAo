@@ -20,9 +20,11 @@ import {
   fetchRelatedProducts,
 } from "../../services/productService.js";
 import { addCartItem } from "../../services/cartService.js";
+import { useWishlist } from "../account/WishlistContext.jsx";
 
 export function Detail({ user, setToast, onCart }) {
   const { id } = useParams(),
+    { ids: wishlistIds, toggle: toggleWishlistItem } = useWishlist(),
     location = useLocation(),
     navigate = useNavigate(),
     [p, setP] = useState(null),
@@ -179,8 +181,14 @@ export function Detail({ user, setToast, onCart }) {
               <ShoppingBag size={16} />
               {user?.role === "USER" ? "Thêm vào giỏ" : "Đăng nhập để mua"}
             </button>
-            <button className={secondary}>
-              <Heart size={18} />
+            <button
+              type="button"
+              onClick={() => toggleWishlistItem(id)}
+              aria-label={wishlistIds.has(String(id)) ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
+              aria-pressed={wishlistIds.has(String(id))}
+              className={secondary + (wishlistIds.has(String(id)) ? " text-rose-600" : "")}
+            >
+              <Heart size={18} className={wishlistIds.has(String(id)) ? "fill-rose-100" : ""} />
             </button>
           </div>
           <div className="mt-7 grid gap-3 border-t border-line pt-5 text-xs text-slate-500 sm:grid-cols-2">

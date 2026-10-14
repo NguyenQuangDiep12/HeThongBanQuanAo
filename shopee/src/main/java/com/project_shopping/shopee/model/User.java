@@ -54,6 +54,9 @@ public class User {
     )
     private Role role = Role.USER;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     @Column(length = 30)
     private String phone;
 
