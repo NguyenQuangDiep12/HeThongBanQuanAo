@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +47,21 @@ public interface ProductRepository
             String name,
             Long categoryId
     );
+
+    @Query("""
+            SELECT p.name AS name, p.category.id AS categoryId
+            FROM Product p
+            WHERE p.category.id IN :categoryIds
+            """)
+    List<CatalogProductKey> findCatalogProductKeys(
+            @Param("categoryIds") Collection<Long> categoryIds
+    );
+
+    interface CatalogProductKey {
+        String getName();
+
+        Long getCategoryId();
+    }
 
     @EntityGraph(attributePaths = {"variants", "category"})
     List<Product> findAllByOrderByCreatedAtDesc();
