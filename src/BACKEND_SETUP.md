@@ -23,6 +23,10 @@ At startup, `AdminBootstrap` creates the initial admin when that email does not 
 
 `DemoDataSeeder` prepares sample customer accounts, products, variants, carts, orders, payments, and notifications only in the `dev` profile. Its sample password defaults to `123456` only in that profile. Seeding is disabled outside `dev` and can be disabled locally with `BOOTSTRAP_DEMO_DATA=false`. Never activate the `dev` profile against a production database.
 
+`ProductCatalogSeeder` loads `src/main/resources/catalog/products-350.json` on backend startup. It creates the seven catalog categories as needed, enables those categories, and inserts missing products with their one size/color variant. A product already present by case-insensitive name and category is preserved and skipped, so restarting the backend does not reset admin-edited prices, stock, images, or status. Set `BOOTSTRAP_PRODUCT_CATALOG=false` to disable this seeder. The workbook labels prices and stock as simulated and its Unsplash URLs as reference images; this project has been configured to make those entries active and purchasable as requested.
+
+Vercel hosts the React/Vite frontend; it does not start this Java seeder or write to MySQL. Deploy the backend separately with access to the same persistent database, then set the Vercel build environment variable `VITE_API_BASE_URL` to the backend origin (without `/api`) and set backend `APP_CORS_ALLOWED_ORIGINS` to the deployed frontend origin. The frontend already requests its catalog from `GET /api/products`. The backend must successfully start before the 350 rows can appear. These deployment settings have not been exercised against a live Vercel/backend/database account in this workspace.
+
 Clean or build only the backend from this directory:
 
 ```powershell
