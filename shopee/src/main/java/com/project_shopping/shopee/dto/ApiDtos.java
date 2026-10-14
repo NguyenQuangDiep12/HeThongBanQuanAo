@@ -6,12 +6,14 @@ import com.project_shopping.shopee.model.enums.PaymentMethod;
 import com.project_shopping.shopee.model.enums.PaymentStatus;
 import com.project_shopping.shopee.model.enums.ProductStatus;
 import com.project_shopping.shopee.model.enums.Role;
+import com.project_shopping.shopee.validation.WholeVndAmount;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -38,6 +40,7 @@ public final class ApiDtos {
             String email,
 
             @NotBlank
+            @Size(min = 8, max = 72)
             String password,
 
             @Size(max = 30)
@@ -86,6 +89,8 @@ public final class ApiDtos {
 
             @NotNull
             @DecimalMin("0.01")
+            @Digits(integer = 10, fraction = 2)
+            @WholeVndAmount
             BigDecimal price,
 
             @Size(max = 1000)
@@ -110,6 +115,8 @@ public final class ApiDtos {
 
             @NotNull
             @DecimalMin("0.01")
+            @Digits(integer = 10, fraction = 2)
+            @WholeVndAmount
             BigDecimal price
     ) {
     }
@@ -178,6 +185,69 @@ public final class ApiDtos {
             BigDecimal maxPrice
     ) {
     }
+
+    // ==================== ADMIN STATISTICS ====================
+
+    public record AdminStatisticsResponse(
+            long totalProducts,
+            long activeProducts,
+            long inactiveProducts,
+            long totalInventory,
+            long lowStockProducts,
+            long outOfStockProducts,
+            long totalOrders,
+            long pendingOrders,
+            long completedOrders,
+            long cancelledOrders,
+            long totalCustomers,
+            BigDecimal completedRevenue,
+            List<CategoryStatistic> productsByCategory,
+            List<OrderStatusStatistic> ordersByStatus,
+            List<TopProductStatistic> topSellingProducts
+    ) {
+    }
+
+    public record CategoryStatistic(String category, long productCount, long stockQuantity) {
+    }
+
+    public record OrderStatusStatistic(String status, long orderCount) {
+    }
+
+    public record TopProductStatistic(Long productId, String productName, long quantitySold, BigDecimal revenue) {
+    }
+
+    public record ReviewRequest(
+            @NotNull @Positive @Max(5) Integer rating,
+            @Size(max = 1000) String comment
+    ) {
+    }
+
+    public record ReviewResponse(
+            Long id,
+            Long productId,
+            Long userId,
+            String customerName,
+            int rating,
+            String comment,
+            Instant createdAt
+    ) {
+    }
+
+    public record AdminUserResponse(
+            Long id,
+            String fullName,
+            String email,
+            String phone,
+            Role role,
+            boolean active,
+            Instant createdAt
+    ) {
+    }
+
+    public record ProfileUpdateRequest(
+            @NotBlank @Size(max = 120) String fullName,
+            @Size(max = 30) String phone
+    ) { }
 
     // ==================== CART ====================
 
@@ -253,7 +323,8 @@ public final class ApiDtos {
             PaymentMethod paymentMethod,
             PaymentStatus paymentStatus,
             BigDecimal amount,
-            Instant paidAt
+            Instant paidAt,
+            String transferMemo
     ) {
     }
 

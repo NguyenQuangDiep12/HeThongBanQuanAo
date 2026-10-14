@@ -79,15 +79,15 @@ public class SecurityConfig {
         );
 
         http.authorizeHttpRequests(auth -> auth
-            .requestMatchers(
-                HttpMethod.POST,
-                "/api/auth/register",
-                "/api/auth/login"
-            ).permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+            .requestMatchers("/api/auth/me").hasAnyRole("USER", "ADMIN")
 
             .requestMatchers(
                 HttpMethod.GET,
-                "/api/products/**"
+                "/api/products/**",
+                "/api/categories/**",
+                "/api/bank-accounts/active"
             ).permitAll()
 
             .requestMatchers("/api/admin/**")
@@ -96,7 +96,8 @@ public class SecurityConfig {
             .requestMatchers(
                 "/api/cart/**",
                 "/api/orders/**",
-                "/api/notifications/**"
+                "/api/notifications/**",
+                "/api/wishlist/**"
             ).hasRole("USER")
 
             .anyRequest()

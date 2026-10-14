@@ -16,19 +16,29 @@ import java.util.*;
 
 @Service
 public class OrderService {
+
+    // DECIMAL(14,2) is used by orders.total_amount, order_items.sub_total,
+    // payments.amount, and payment_transactions.amount.
+    private static final BigDecimal MAX_PERSISTABLE_ORDER_AMOUNT = new BigDecimal("999999999999.99");
     private final OrderRepository orders;
     private final UserRepository users;
     private final CartRepository carts;
     private final VariantRepository variants;
     private final NotificationRepository notifications;
+    private final PaymentTransactionService paymentTransactionService;
+    private final PaymentTransactionRepository paymentTransactionRepository;
 
     public OrderService(OrderRepository orders, UserRepository users, CartRepository carts,
-                        VariantRepository variants, NotificationRepository notifications) {
+                        VariantRepository variants, NotificationRepository notifications,
+                        PaymentTransactionService paymentTransactionService,
+                        PaymentTransactionRepository paymentTransactionRepository) {
         this.orders = orders;
         this.users = users;
         this.carts = carts;
         this.variants = variants;
         this.notifications = notifications;
+        this.paymentTransactionService = paymentTransactionService;
+        this.paymentTransactionRepository = paymentTransactionRepository;
     }
 
     @Transactional
@@ -49,9 +59,13 @@ public class OrderService {
             if (variant.getProduct().getStatus() != ProductStatus.ACTIVE) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giỏ hàng có sản phẩm đã ngừng kinh doanh. Vui lòng cập nhật giỏ hàng.");
             }
-            if (item.getQuantity() > variant.getStockQuantity()) {
+            if (item.getQuantity() <= 0
+                    || variant.getStockQuantity() < 0
+                    || item.getQuantity() > variant.getStockQuantity()
+                    || variant.getPrice() == null
+                    || variant.getPrice().signum() <= 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Số lượng tồn kho không đủ cho một sản phẩm trong giỏ hàng. Vui lòng cập nhật số lượng.");
+                        "Số lượng hoặc giá của một sản phẩm trong giỏ hàng không hợp lệ. Vui lòng cập nhật giỏ hàng.");
             }
             lockedVariants.put(variant.getId(), variant);
         }
@@ -60,6 +74,13 @@ public class OrderService {
                 .map(item -> lockedVariants.get(item.getVariant().getId()).getPrice()
                         .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (total.signum() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tổng tiền đơn hàng không hợp lệ.");
+        }
+        if (total.compareTo(MAX_PERSISTABLE_ORDER_AMOUNT) > 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Tổng tiền đơn hàng vượt quá giới hạn dữ liệu cho phép.");
+        }
         CustomerOrder order = new CustomerOrder(user, request.shippingAddress().trim(), request.phone().trim(), total);
         for (CartItem item : cart.getItems()) {
             ProductVariant variant = lockedVariants.get(item.getVariant().getId());
@@ -69,6 +90,11 @@ public class OrderService {
         Payment payment = new Payment(order, request.paymentMethod(), total);
         order.setPayment(payment);
         CustomerOrder saved = orders.save(order);
+
+        if (request.paymentMethod() == com.project_shopping.shopee.model.enums.PaymentMethod.BANKING) {
+            paymentTransactionService.createTransactionForOrder(saved);
+        }
+
         cart.getItems().clear();
         cart.setUpdatedAt(Instant.now());
         return toResponse(saved);
@@ -161,6 +187,15 @@ public class OrderService {
     private OrderResponse cancelPendingOrder(CustomerOrder order) {
         requireStatus(order, OrderStatus.PENDING, "Chỉ đơn hàng đang chờ xác nhận mới có thể được hủy.");
         Instant cancelledAt = timestampAfter(order.getCreatedAt());
+        paymentTransactionRepository.findAllByOrderIdForUpdate(order.getId()).stream()
+                .filter(transaction -> transaction.getStatus()
+                        == PaymentTransaction.TransactionStatus.PENDING)
+                .forEach(transaction -> transaction.setStatus(
+                        PaymentTransaction.TransactionStatus.REJECTED));
+        if (order.getPayment() != null
+                && order.getPayment().getPaymentMethod() == com.project_shopping.shopee.model.enums.PaymentMethod.BANKING) {
+            order.getPayment().setPaymentStatus(com.project_shopping.shopee.model.enums.PaymentStatus.FAILED);
+        }
         restoreInventory(order);
         order.setStatus(OrderStatus.CANCELLED);
         order.setCancelledAt(cancelledAt);
@@ -179,7 +214,16 @@ public class OrderService {
         }
         for (OrderItem line : order.getItems()) {
             ProductVariant variant = lockedVariants.get(line.getVariant().getId());
-            variant.setStockQuantity(Math.addExact(variant.getStockQuantity(), line.getQuantity()));
+            if (line.getQuantity() <= 0 || variant.getStockQuantity() < 0) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Dữ liệu tồn kho hoặc số lượng trong đơn hàng không hợp lệ.");
+            }
+            try {
+                variant.setStockQuantity(Math.addExact(variant.getStockQuantity(), line.getQuantity()));
+            } catch (ArithmeticException exception) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Không thể khôi phục tồn kho do vượt giới hạn số lượng.");
+            }
         }
     }
 
@@ -202,11 +246,7 @@ public class OrderService {
 
     private Instant timestampAfter(Instant previous) {
         Instant now = Instant.now();
-        if (previous != null && now.isBefore(previous)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Thời gian hệ thống không hợp lệ để cập nhật trạng thái đơn hàng.");
-        }
-        return now;
+        return previous != null && now.isBefore(previous) ? previous : now;
     }
 
     private void notifyCustomer(CustomerOrder order, String title, String message) {
@@ -227,9 +267,15 @@ public class OrderService {
                         item.getUnitPrice(), item.getSubTotal()))
                 .toList();
         Payment payment = order.getPayment();
+        String transferMemo = null;
+        if (payment != null && payment.getPaymentMethod() == com.project_shopping.shopee.model.enums.PaymentMethod.BANKING) {
+            transferMemo = paymentTransactionRepository.findFirstByOrderIdOrderByCreatedAtDesc(order.getId())
+                    .map(com.project_shopping.shopee.model.PaymentTransaction::getTransferMemo)
+                    .orElse(null);
+        }
         PaymentResponse paymentResponse = payment == null ? null
                 : new PaymentResponse(payment.getPaymentMethod(), payment.getPaymentStatus(),
-                payment.getAmount(), payment.getPaidAt());
+                payment.getAmount(), payment.getPaidAt(), transferMemo);
         return new OrderResponse(order.getId(), order.getUser().getId(), order.getShippingAddress(),
                 order.getPhone(), order.getTotalAmount(), order.getStatus(), order.getCreatedAt(),
                 order.getConfirmedAt(), order.getShippingAt(), order.getDeliveredAt(),

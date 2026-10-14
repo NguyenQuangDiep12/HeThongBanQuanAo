@@ -7,6 +7,7 @@ import { Header } from './components/layout/Header.jsx';
 import { Footer } from './components/layout/Footer.jsx';
 import { AppRoutes } from './AppRoutes.jsx';
 import { fetchCart } from './services/cartService.js';
+import { WishlistProvider } from './features/account/WishlistContext.jsx';
 
 function App() {
   const [user, setUser] = useState(getUser);
@@ -59,8 +60,10 @@ function App() {
 
   return (
     <div className="min-h-screen">
-      <Header user={user} count={cartCount} logout={logout} />
-      <AppRoutes user={user} setUser={setUser} setToast={setToast} refreshCart={refreshCart} logout={logout} />
+      <WishlistProvider user={user} setToast={setToast}>
+        <Header user={user} count={cartCount} logout={logout} />
+        <AppRoutes user={user} setUser={setUser} setToast={setToast} refreshCart={refreshCart} logout={logout} />
+      </WishlistProvider>
       <Footer />
       <Toast message={toast} />
     </div>

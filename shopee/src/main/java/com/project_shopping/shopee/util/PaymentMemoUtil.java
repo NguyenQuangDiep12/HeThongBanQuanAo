@@ -1,0 +1,38 @@
+package com.project_shopping.shopee.util;
+
+import java.text.Normalizer;
+import java.security.SecureRandom;
+import java.util.Locale;
+
+public final class PaymentMemoUtil {
+
+    private static final String CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    private PaymentMemoUtil() {}
+
+    /**
+     * Bỏ dấu Tiếng Việt & loại bỏ ký tự đặc biệt
+     */
+    public static String stripAccents(String input) {
+        if (input == null || input.isBlank()) return "";
+        String nfdNormalizedString = Normalizer.normalize(input, Normalizer.Form.NFD);
+        String withoutAccents = nfdNormalizedString.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        return withoutAccents
+                .replace("đ", "d")
+                .replace("Đ", "D")
+                .replaceAll("[^a-zA-Z0-9]", "")
+                .toUpperCase(Locale.ROOT);
+    }
+
+    /**
+     * Sinh mã ngẫu nhiên khó đoán (VD: K92F7Q2M).
+     */
+    public static String generateRandomCode(int length) {
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(CHARS.charAt(RANDOM.nextInt(CHARS.length())));
+        }
+        return sb.toString();
+    }
+}

@@ -75,10 +75,13 @@ public class CartService {
                 .findFirst()
                 .orElse(null);
 
-        int newQuantity = request.quantity()
-                + (line == null ? 0 : line.getQuantity());
+        long existingQuantity = line == null ? 0L : line.getQuantity();
+        long newQuantity = (long) request.quantity() + existingQuantity;
 
-        if (newQuantity > variant.getStockQuantity()) {
+        if (request.quantity() <= 0
+                || existingQuantity < 0
+                || variant.getStockQuantity() < 0
+                || newQuantity > variant.getStockQuantity()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Số lượng yêu cầu vượt quá số lượng sản phẩm còn trong kho."
@@ -90,11 +93,11 @@ public class CartService {
                     new CartItem(
                             cart,
                             variant,
-                            newQuantity
+                            Math.toIntExact(newQuantity)
                     )
             );
         } else {
-            line.setQuantity(newQuantity);
+            line.setQuantity(Math.toIntExact(newQuantity));
         }
 
         cart.setUpdatedAt(Instant.now());
@@ -129,7 +132,9 @@ public class CartService {
             );
         }
 
-        if (request.quantity() > variant.getStockQuantity()) {
+        if (request.quantity() <= 0
+                || variant.getStockQuantity() < 0
+                || request.quantity() > variant.getStockQuantity()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Số lượng yêu cầu vượt quá số lượng sản phẩm còn trong kho."

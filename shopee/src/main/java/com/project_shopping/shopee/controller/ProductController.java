@@ -23,6 +23,7 @@ public class ProductController {
     public ProductPageResponse getProducts(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String type,
             @RequestParam(required = false) String size,
             @RequestParam(required = false) String color,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -34,7 +35,7 @@ public class ProductController {
 
         return productService.search(
                 keyword,
-                category,
+                category != null && !category.isBlank() ? category : type,
                 size,
                 color,
                 minPrice,

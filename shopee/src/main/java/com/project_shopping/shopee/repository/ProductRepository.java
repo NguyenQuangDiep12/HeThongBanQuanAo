@@ -5,16 +5,24 @@ import com.project_shopping.shopee.model.enums.ProductStatus;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository
         extends JpaRepository<Product, Long>,
                 JpaSpecificationExecutor<Product> {
+
+    @Override
+    @EntityGraph(attributePaths = "category")
+    Page<Product> findAll(Specification<Product> specification, Pageable pageable);
 
     // ==================== PRODUCT ====================
 
@@ -40,6 +48,21 @@ public interface ProductRepository
             Long categoryId
     );
 
+    @Query("""
+            SELECT p.name AS name, p.category.id AS categoryId
+            FROM Product p
+            WHERE p.category.id IN :categoryIds
+            """)
+    List<CatalogProductKey> findCatalogProductKeys(
+            @Param("categoryIds") Collection<Long> categoryIds
+    );
+
+    interface CatalogProductKey {
+        String getName();
+
+        Long getCategoryId();
+    }
+
     @EntityGraph(attributePaths = {"variants", "category"})
     List<Product> findAllByOrderByCreatedAtDesc();
 
@@ -55,6 +78,35 @@ public interface ProductRepository
     long countByCategory_Id(Long categoryId);
 
     boolean existsByCategory_Id(Long categoryId);
+
+    long countByStatus(ProductStatus status);
+
+    @Query("SELECT COALESCE(SUM(v.stockQuantity), 0) FROM ProductVariant v")
+    long totalInventory();
+
+    @Query("""
+            SELECT COUNT(p)
+            FROM Product p
+            WHERE p.status = :status
+              AND (SELECT COALESCE(SUM(v.stockQuantity), 0) FROM ProductVariant v WHERE v.product = p) BETWEEN 1 AND :threshold
+            """)
+    long countLowStockProducts(@Param("status") ProductStatus status, @Param("threshold") int threshold);
+
+    @Query("""
+            SELECT COUNT(p)
+            FROM Product p
+            WHERE p.status = :status
+              AND NOT EXISTS (SELECT v.id FROM ProductVariant v WHERE v.product = p AND v.stockQuantity > 0)
+            """)
+    long countOutOfStockProducts(@Param("status") ProductStatus status);
+
+    @Query("""
+            SELECT p.category.name, COUNT(DISTINCT p), COALESCE(SUM(v.stockQuantity), 0)
+            FROM Product p LEFT JOIN p.variants v
+            GROUP BY p.category.id, p.category.name
+            ORDER BY p.category.name
+            """)
+    List<Object[]> summarizeProductsByCategory();
 
     // ==================== FILTER OPTIONS ====================
 

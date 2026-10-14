@@ -1,10 +1,10 @@
 # E-Commerce Mini Backend
 
-Backend Spring Boot 3.5 / Java 21 / MySQL 8. API prefix: `/api`. Database changes are applied by Flyway on startup from `main/resources/db/migration`.
+Backend Spring Boot 3.5 / Java 21 / MySQL 8. API prefix: `/api`. Versioned Flyway scripts are present under `src/main/resources/db/migration`, but the checked-in runtime configuration currently disables Flyway and uses Hibernate `ddl-auto=update`.
 
 ## Run locally — backend only
 
-Open a PowerShell window for the backend:
+Open a PowerShell window for the backend. The `dev` profile is local-only and enables sample data; set the required secrets before starting:
 
 ```powershell
 cd C:\DAAAN\shopee\shopee
@@ -13,14 +13,19 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 $env:DB_USERNAME = 'root'
 $env:DB_PASSWORD = '<your-local-mysql-password>'
 $env:JWT_SECRET = '<a unique random secret of at least 32 bytes>'
-.\mvnw.cmd spring-boot:run
+$env:ADMIN_PASSWORD = '<a unique password of at least 8 characters>'
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-This starts only Spring Boot. The backend reads the database URL and application defaults from `src/main/resources/application.properties`; credentials and signing secrets come from environment variables. Start MySQL and ensure the configured `clotherwebsite` database exists. If `JWT_SECRET` is omitted, local development uses a newly generated temporary key and existing tokens become invalid after restart. Set a unique stable `JWT_SECRET` for deployments or multiple backend instances.
+This starts only Spring Boot. Local database defaults come from `application-dev.properties`; `DB_PASSWORD`, `JWT_SECRET`, and `ADMIN_PASSWORD` must be supplied. Start MySQL and ensure the configured `clotherwebsite` database exists. The API fails to start if `JWT_SECRET` is missing or shorter than 32 bytes. Outside `dev`/`test`, an early `EnvironmentPostProcessor` validates a non-root database account, password, a JWT secret of at least 32 bytes, and a `DB_URL` query parameter `sslMode=VERIFY_IDENTITY` backed by a trusted certificate. `ADMIN_EMAIL` and `ADMIN_PASSWORD` are optional one-time bootstrap credentials and must be provided together when used. Configure these before deployment; do not activate the `dev` profile against production data.
 
-At startup, `AdminBootstrap` creates the initial admin when that email does not already exist. Local development defaults are `admin@local` / `123456`; set `ADMIN_EMAIL` and `ADMIN_PASSWORD` to override them. Use a stronger password outside a local development environment.
+At startup, `AdminBootstrap` creates the initial admin when that email does not already exist. In `dev`, the email defaults to `admin@local`; `ADMIN_PASSWORD` must be supplied. An existing admin's active state is preserved on restart.
 
-`DemoDataSeeder` prepares 20 sample customer accounts (`user@local`, `demo-user-02@local` … `demo-user-20@local`, password `123456` by default), 20 clothing products across the catalog categories, product size/color variants, and up to 20 sample rows in each customer-facing transaction table: carts/cart items, orders/order items, payments, and notifications. Orders use varied lifecycle states and sample addresses. Existing categories, products, variants, customer carts, and customer orders are preserved; missing sample rows are filled on startup. Sample orders are created only for sample users who do not already have orders. Override the first sample account with `DEMO_USER_EMAIL` and `DEMO_USER_PASSWORD`, or disable this with `BOOTSTRAP_DEMO_DATA=false`. Seeded customers all have the `USER` role. For a live TiDB database, enable seeding for one successful startup, then set `BOOTSTRAP_DEMO_DATA=false` and redeploy to stop creating sample rows for newly missing sample users.
+`DemoDataSeeder` prepares sample customer accounts, products, variants, carts, orders, payments, and notifications only in the `dev` profile. Its sample password defaults to `123456` only in that profile. Seeding is disabled outside `dev` and can be disabled locally with `BOOTSTRAP_DEMO_DATA=false`. Never activate the `dev` profile against a production database.
+
+`ProductCatalogSeeder` loads `src/main/resources/catalog/products-350.json` on backend startup. It creates the seven catalog categories as needed, enables those categories, and inserts missing products with their one size/color variant. A product already present by case-insensitive name and category is preserved and skipped, so restarting the backend does not reset admin-edited prices, stock, images, or status. Set `BOOTSTRAP_PRODUCT_CATALOG=false` to disable this seeder. The workbook labels prices and stock as simulated and its Unsplash URLs as reference images; this project has been configured to make those entries active and purchasable as requested.
+
+Vercel hosts the React/Vite frontend; it does not start this Java seeder or write to MySQL. Deploy the backend separately with access to the same persistent database, then set the Vercel build environment variable `VITE_API_BASE_URL` to the backend origin (without `/api`) and set backend `APP_CORS_ALLOWED_ORIGINS` to the deployed frontend origin. The frontend already requests its catalog from `GET /api/products`. The backend must successfully start before the 350 rows can appear. These deployment settings have not been exercised against a live Vercel/backend/database account in this workspace.
 
 Clean or build only the backend from this directory:
 
@@ -41,6 +46,7 @@ Frontend is a separate project in `C:\DAAAN\shopee\frontend`; use its own PowerS
 | USER | `GET /api/cart`, `POST /api/cart/items`, `PUT /api/cart/items/{id}`, `DELETE /api/cart/items/{id}` | Manage own cart |
 | USER | `POST /api/orders`, `GET /api/orders`, `GET /api/orders/{id}` | Checkout and view own orders |
 | USER | `GET /api/notifications`, `PUT /api/notifications/{id}/read` | Read own order notifications |
+| USER | `GET /api/wishlist`, `POST /api/wishlist/{productId}`, `DELETE /api/wishlist/{productId}` | View, save, and remove favorite products |
 | ADMIN | `GET/POST /api/admin/products`, `PUT/DELETE /api/admin/products/{id}` | Manage products; delete means deactivate |
 | ADMIN | `GET/POST /api/admin/categories`, `PUT/DELETE /api/admin/categories/{id}` | Manage categories; deleting a category that still has products returns 409 |
 | ADMIN | `POST/PUT/DELETE /api/admin/products/{productId}/variants[/{variantId}]` | Manage product variants |
@@ -95,4 +101,4 @@ Checkout locks cart and variant rows and writes the order, order lines, payment 
 
 ## Test coverage
 
-The current automated test suite contains a Spring context-load test using an ephemeral H2 database and the `test` profile. It does not yet cover checkout concurrency, authorization scenarios, or complete order lifecycle behavior. The production profile uses MySQL 8 and runs the Flyway schema migrations.
+The automated backend tests include a Spring context-load test, a critical business flow through MockMvc/H2, admin-bootstrap tests, and production configuration guard tests. The test profile uses a uniquely named in-memory H2 database and `ddl-auto=create-drop`. No production MySQL connection is available in this repository session. Production runtime currently disables Flyway and uses `ddl-auto=update`; SQL migrations are present but are not automatically run by the checked-in default configuration. Confirm the deployed schema and migration history before changing this strategy.
