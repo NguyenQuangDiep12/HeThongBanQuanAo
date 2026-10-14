@@ -1,0 +1,46 @@
+@startuml
+|Customer|
+start
+:Submit checkout details;
+|HTTP API / Security|
+:POST /api/orders; authenticate and validate request;
+if (Authenticated as USER and request valid?) then (yes)
+  |OrderService|
+  :Find user by email;
+  if (User exists?) then (yes)
+    :Lock user cart;
+    if (Cart exists and is non-empty?) then (yes)
+      :For each cart line sorted by variant ID,
+      lock variant and validate product/stock;
+      if (Every line valid?) then (yes)
+        :Compute total; create order, items,
+        payment; decrement stock;
+        if (Payment method is BANKING?) then (yes)
+          :Create payment transaction;
+        endif
+        :Save order; clear cart; update timestamp;
+        |HTTP API / Security|
+        :Return 201 OrderResponse;
+        |Customer|
+        :Receive order response;
+        stop
+      else (no)
+        |HTTP API / Security|
+        :Return 400 checkout error;
+        stop
+      endif
+    else (no)
+      |HTTP API / Security|
+      :Return 400 empty-cart error;
+      stop
+    endif
+  else (no)
+    |HTTP API / Security|
+    :Return 401 user-not-found error;
+    stop
+  endif
+else (no)
+  :Return 401 / 403 or request-validation error;
+  stop
+endif
+@enduml

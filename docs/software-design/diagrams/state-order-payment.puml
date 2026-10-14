@@ -1,0 +1,23 @@
+@startuml
+hide empty description
+[*] --> PENDING : Order created by checkout
+PENDING --> CONFIRMED : OrderService.confirm
+PENDING --> CANCELLED : cancel / cancelByCustomer
+CONFIRMED --> SHIPPING : startDelivery
+SHIPPING --> DELIVERED : markDelivered
+DELIVERED --> COMPLETED : confirmReceipt by owner
+COMPLETED --> [*]
+CANCELLED --> [*]
+
+note right of CONFIRMED
+  BANKING confirmation requires a PENDING
+  transaction, PENDING order, and BANKING
+  payment. It sets the order to CONFIRMED.
+end note
+
+note bottom of CANCELLED
+  Cancellation accepts PENDING only and restores
+  inventory. Pending BANKING payment becomes FAILED;
+  pending transactions become REJECTED.
+end note
+@enduml

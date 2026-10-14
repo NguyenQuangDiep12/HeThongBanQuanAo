@@ -1,0 +1,48 @@
+@startuml
+autonumber
+actor Customer
+participant "AuthPage.jsx" as UI
+participant "authService.js / api.js" as Client
+participant "Spring Security + MVC\n(AuthController / ApiExceptionHandler)" as API
+participant "AuthService" as Auth
+participant "UserRepository / Database" as Users
+participant "PasswordEncoder" as Encoder
+participant "JwtService" as JWT
+
+Customer -> UI: Enter email and password
+UI -> Client: loginAccount({email, password})
+Client -> API: POST /api/auth/login (JSON)
+API -> Auth: login(LoginRequest)
+Auth -> Users: findByEmailIgnoreCase(email.trim())
+Users --> Auth: Optional<User>
+alt User not found
+  Auth --> API: 401 Unauthorized
+  API --> Client: 401 JSON error
+  Client --> UI: Reject login promise
+  UI --> Customer: Show error toast
+else User found
+  Auth -> Encoder: matches(rawPassword, passwordHash)
+  Encoder --> Auth: matched / not matched
+  alt Password mismatch
+    Auth --> API: 401 Unauthorized
+    API --> Client: 401 JSON error
+    Client --> UI: Reject login promise
+    UI --> Customer: Show error toast
+  else Password matched
+    alt Account inactive
+      Auth --> API: 403 Forbidden
+      API --> Client: 403 JSON error
+      Client --> UI: Reject login promise
+      UI --> Customer: Show error toast
+    else Account active
+      Auth -> JWT: createToken(user)
+      JWT --> Auth: signed JWT
+      Auth --> API: AuthResponse(token, userId, role)
+      API --> Client: 200 AuthResponse
+      Client --> UI: Resolve login promise
+      UI -> UI: Store session; choose safe redirect / role route
+      UI --> Customer: Show authenticated page
+    end
+  end
+end
+@enduml
