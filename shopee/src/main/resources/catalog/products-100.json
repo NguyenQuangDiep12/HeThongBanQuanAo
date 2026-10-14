@@ -1,0 +1,1002 @@
+[
+  {
+    "name": "Áo thun thể thao co giãn 01",
+    "category": "Đồ thể thao",
+    "priceVnd": 89000,
+    "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Đen",
+    "stockQuantity": 52,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần short gym co giãn 02",
+    "category": "Đồ thể thao",
+    "priceVnd": 229000,
+    "imageUrl": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Đen",
+    "stockQuantity": 49,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần legging co giãn 03",
+    "category": "Đồ thể thao",
+    "priceVnd": 179000,
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Trắng",
+    "stockQuantity": 24,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo bra thể thao co giãn 04",
+    "category": "Đồ thể thao",
+    "priceVnd": 149000,
+    "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
+    "size": "XL",
+    "color": "Trắng",
+    "stockQuantity": 70,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Bộ đồ tập co giãn 05",
+    "category": "Đồ thể thao",
+    "priceVnd": 89000,
+    "imageUrl": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80",
+    "size": "2XL",
+    "color": "Xám",
+    "stockQuantity": 107,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo khoác chạy bộ co giãn 06",
+    "category": "Đồ thể thao",
+    "priceVnd": 299000,
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Xám",
+    "stockQuantity": 65,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo bóng đá co giãn 07",
+    "category": "Đồ thể thao",
+    "priceVnd": 179000,
+    "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Xanh navy",
+    "stockQuantity": 26,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần jogger thể thao co giãn 08",
+    "category": "Đồ thể thao",
+    "priceVnd": 179000,
+    "imageUrl": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Xanh navy",
+    "stockQuantity": 9,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo tank top co giãn 09",
+    "category": "Đồ thể thao",
+    "priceVnd": 299000,
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80",
+    "size": "XL",
+    "color": "Hồng",
+    "stockQuantity": 5,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo tập yoga co giãn 10",
+    "category": "Đồ thể thao",
+    "priceVnd": 69000,
+    "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
+    "size": "2XL",
+    "color": "Hồng",
+    "stockQuantity": 107,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo thun thể thao nhanh khô 11",
+    "category": "Đồ thể thao",
+    "priceVnd": 229000,
+    "imageUrl": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Tím",
+    "stockQuantity": 22,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần short gym nhanh khô 12",
+    "category": "Đồ thể thao",
+    "priceVnd": 229000,
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Tím",
+    "stockQuantity": 89,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần legging nhanh khô 13",
+    "category": "Đồ thể thao",
+    "priceVnd": 89000,
+    "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Đỏ",
+    "stockQuantity": 12,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo bra thể thao nhanh khô 14",
+    "category": "Đồ thể thao",
+    "priceVnd": 149000,
+    "imageUrl": "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=900&q=80",
+    "size": "XL",
+    "color": "Đỏ",
+    "stockQuantity": 5,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày sneaker đế nhẹ 01",
+    "category": "Giày dép",
+    "priceVnd": 329000,
+    "imageUrl": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
+    "size": "36",
+    "color": "Trắng",
+    "stockQuantity": 78,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày thể thao đế nhẹ 02",
+    "category": "Giày dép",
+    "priceVnd": 399000,
+    "imageUrl": "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80",
+    "size": "37",
+    "color": "Trắng",
+    "stockQuantity": 59,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày lười đế nhẹ 03",
+    "category": "Giày dép",
+    "priceVnd": 99000,
+    "imageUrl": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80",
+    "size": "38",
+    "color": "Đen",
+    "stockQuantity": 37,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Dép quai ngang đế nhẹ 04",
+    "category": "Giày dép",
+    "priceVnd": 189000,
+    "imageUrl": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
+    "size": "39",
+    "color": "Đen",
+    "stockQuantity": 5,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Sandal đế nhẹ 05",
+    "category": "Giày dép",
+    "priceVnd": 229000,
+    "imageUrl": "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80",
+    "size": "40",
+    "color": "Kem",
+    "stockQuantity": 17,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày canvas đế nhẹ 06",
+    "category": "Giày dép",
+    "priceVnd": 189000,
+    "imageUrl": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80",
+    "size": "41",
+    "color": "Kem",
+    "stockQuantity": 60,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày chạy bộ đế nhẹ 07",
+    "category": "Giày dép",
+    "priceVnd": 399000,
+    "imageUrl": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
+    "size": "42",
+    "color": "Xám",
+    "stockQuantity": 65,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày slip-on đế nhẹ 08",
+    "category": "Giày dép",
+    "priceVnd": 329000,
+    "imageUrl": "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80",
+    "size": "43",
+    "color": "Xám",
+    "stockQuantity": 34,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Dép sandal đế nhẹ 09",
+    "category": "Giày dép",
+    "priceVnd": 189000,
+    "imageUrl": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80",
+    "size": "36",
+    "color": "Đỏ",
+    "stockQuantity": 95,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày casual đế nhẹ 10",
+    "category": "Giày dép",
+    "priceVnd": 159000,
+    "imageUrl": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
+    "size": "37",
+    "color": "Đỏ",
+    "stockQuantity": 115,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày sneaker phong cách Hàn Quốc 11",
+    "category": "Giày dép",
+    "priceVnd": 329000,
+    "imageUrl": "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80",
+    "size": "38",
+    "color": "Xanh",
+    "stockQuantity": 116,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày thể thao phong cách Hàn Quốc 12",
+    "category": "Giày dép",
+    "priceVnd": 99000,
+    "imageUrl": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80",
+    "size": "39",
+    "color": "Xanh",
+    "stockQuantity": 90,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Giày lười phong cách Hàn Quốc 13",
+    "category": "Giày dép",
+    "priceVnd": 329000,
+    "imageUrl": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
+    "size": "40",
+    "color": "Be",
+    "stockQuantity": 77,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Dép quai ngang phong cách Hàn Quốc 14",
+    "category": "Giày dép",
+    "priceVnd": 129000,
+    "imageUrl": "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=900&q=80",
+    "size": "41",
+    "color": "Be",
+    "stockQuantity": 118,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Mũ lưỡi trai basic 01",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 59000,
+    "imageUrl": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Đen",
+    "stockQuantity": 49,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Mũ bucket basic 02",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 29000,
+    "imageUrl": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Đen",
+    "stockQuantity": 36,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Kính mát basic 03",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 119000,
+    "imageUrl": "https://images.unsplash.com/photo-1509695507497-903c140c43b0?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Trắng",
+    "stockQuantity": 54,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Đồng hồ thời trang basic 04",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 119000,
+    "imageUrl": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Trắng",
+    "stockQuantity": 98,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Vòng tay basic 05",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 159000,
+    "imageUrl": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Bạc",
+    "stockQuantity": 73,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Dây chuyền basic 06",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 119000,
+    "imageUrl": "https://images.unsplash.com/photo-1509695507497-903c140c43b0?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Bạc",
+    "stockQuantity": 97,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Khăn choàng basic 07",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 199000,
+    "imageUrl": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Vàng",
+    "stockQuantity": 111,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Tất cổ ngắn basic 08",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 59000,
+    "imageUrl": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Vàng",
+    "stockQuantity": 99,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Thắt khăn basic 09",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 89000,
+    "imageUrl": "https://images.unsplash.com/photo-1509695507497-903c140c43b0?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Nâu",
+    "stockQuantity": 117,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Kẹp tóc basic 10",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 119000,
+    "imageUrl": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Nâu",
+    "stockQuantity": 105,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Mũ lưỡi trai tối giản 11",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 39000,
+    "imageUrl": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Hồng",
+    "stockQuantity": 92,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Mũ bucket tối giản 12",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 199000,
+    "imageUrl": "https://images.unsplash.com/photo-1509695507497-903c140c43b0?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Hồng",
+    "stockQuantity": 44,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Kính mát tối giản 13",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 119000,
+    "imageUrl": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Xanh",
+    "stockQuantity": 13,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Đồng hồ thời trang tối giản 14",
+    "category": "Phụ kiện thời trang",
+    "priceVnd": 39000,
+    "imageUrl": "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Xanh",
+    "stockQuantity": 54,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo thun basic 01",
+    "category": "Quần áo",
+    "priceVnd": 99000,
+    "imageUrl": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Đen",
+    "stockQuantity": 25,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo polo basic 02",
+    "category": "Quần áo",
+    "priceVnd": 149000,
+    "imageUrl": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Đen",
+    "stockQuantity": 61,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo sơ mi basic 03",
+    "category": "Quần áo",
+    "priceVnd": 79000,
+    "imageUrl": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Trắng",
+    "stockQuantity": 104,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo hoodie basic 04",
+    "category": "Quần áo",
+    "priceVnd": 259000,
+    "imageUrl": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=80",
+    "size": "XL",
+    "color": "Trắng",
+    "stockQuantity": 5,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo khoác basic 05",
+    "category": "Quần áo",
+    "priceVnd": 79000,
+    "imageUrl": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
+    "size": "2XL",
+    "color": "Be",
+    "stockQuantity": 78,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần jean basic 06",
+    "category": "Quần áo",
+    "priceVnd": 99000,
+    "imageUrl": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Be",
+    "stockQuantity": 67,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần jogger basic 07",
+    "category": "Quần áo",
+    "priceVnd": 259000,
+    "imageUrl": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Xám",
+    "stockQuantity": 54,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần short basic 08",
+    "category": "Quần áo",
+    "priceVnd": 149000,
+    "imageUrl": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Xám",
+    "stockQuantity": 73,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Váy basic 09",
+    "category": "Quần áo",
+    "priceVnd": 219000,
+    "imageUrl": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
+    "size": "XL",
+    "color": "Xanh navy",
+    "stockQuantity": 88,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Đầm basic 10",
+    "category": "Quần áo",
+    "priceVnd": 259000,
+    "imageUrl": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=900&q=80",
+    "size": "2XL",
+    "color": "Xanh navy",
+    "stockQuantity": 80,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo thun form rộng 11",
+    "category": "Quần áo",
+    "priceVnd": 219000,
+    "imageUrl": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Nâu",
+    "stockQuantity": 83,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo polo form rộng 12",
+    "category": "Quần áo",
+    "priceVnd": 149000,
+    "imageUrl": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Nâu",
+    "stockQuantity": 106,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo sơ mi form rộng 13",
+    "category": "Quần áo",
+    "priceVnd": 99000,
+    "imageUrl": "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Hồng",
+    "stockQuantity": 101,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo hoodie form rộng 14",
+    "category": "Quần áo",
+    "priceVnd": 149000,
+    "imageUrl": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=900&q=80",
+    "size": "XL",
+    "color": "Hồng",
+    "stockQuantity": 87,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo thun trẻ em cotton mềm 01",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 199000,
+    "imageUrl": "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=900&q=80",
+    "size": "90",
+    "color": "Trắng",
+    "stockQuantity": 54,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Bộ đồ cotton cotton mềm 02",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 89000,
+    "imageUrl": "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=900&q=80",
+    "size": "100",
+    "color": "Trắng",
+    "stockQuantity": 109,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Váy bé gái cotton mềm 03",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 69000,
+    "imageUrl": "https://images.unsplash.com/photo-1503919005314-30d93d07d823?auto=format&fit=crop&w=900&q=80",
+    "size": "110",
+    "color": "Hồng",
+    "stockQuantity": 106,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần short trẻ em cotton mềm 04",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 169000,
+    "imageUrl": "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=900&q=80",
+    "size": "120",
+    "color": "Hồng",
+    "stockQuantity": 84,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo khoác trẻ em cotton mềm 05",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 139000,
+    "imageUrl": "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=900&q=80",
+    "size": "130",
+    "color": "Xanh",
+    "stockQuantity": 57,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Đồ ngủ trẻ em cotton mềm 06",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 109000,
+    "imageUrl": "https://images.unsplash.com/photo-1503919005314-30d93d07d823?auto=format&fit=crop&w=900&q=80",
+    "size": "140",
+    "color": "Xanh",
+    "stockQuantity": 32,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo polo trẻ em cotton mềm 07",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 139000,
+    "imageUrl": "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=900&q=80",
+    "size": "90",
+    "color": "Vàng",
+    "stockQuantity": 11,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Bộ đồ mùa hè cotton mềm 08",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 49000,
+    "imageUrl": "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=900&q=80",
+    "size": "100",
+    "color": "Vàng",
+    "stockQuantity": 15,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần dài trẻ em cotton mềm 09",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 109000,
+    "imageUrl": "https://images.unsplash.com/photo-1503919005314-30d93d07d823?auto=format&fit=crop&w=900&q=80",
+    "size": "110",
+    "color": "Be",
+    "stockQuantity": 93,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo sơ mi trẻ em cotton mềm 10",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 49000,
+    "imageUrl": "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=900&q=80",
+    "size": "120",
+    "color": "Be",
+    "stockQuantity": 79,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo thun trẻ em dễ thương 11",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 169000,
+    "imageUrl": "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=900&q=80",
+    "size": "130",
+    "color": "Đỏ",
+    "stockQuantity": 110,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Bộ đồ cotton dễ thương 12",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 49000,
+    "imageUrl": "https://images.unsplash.com/photo-1503919005314-30d93d07d823?auto=format&fit=crop&w=900&q=80",
+    "size": "140",
+    "color": "Đỏ",
+    "stockQuantity": 25,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Váy bé gái dễ thương 13",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 199000,
+    "imageUrl": "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=900&q=80",
+    "size": "90",
+    "color": "Tím",
+    "stockQuantity": 69,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Quần short trẻ em dễ thương 14",
+    "category": "Quần áo trẻ em",
+    "priceVnd": 109000,
+    "imageUrl": "https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=900&q=80",
+    "size": "100",
+    "color": "Tím",
+    "stockQuantity": 2,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Túi tote tối giản 01",
+    "category": "Túi xách, balo",
+    "priceVnd": 349000,
+    "imageUrl": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80",
+    "size": "Mini",
+    "color": "Đen",
+    "stockQuantity": 72,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Túi đeo chéo tối giản 02",
+    "category": "Túi xách, balo",
+    "priceVnd": 119000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Đen",
+    "stockQuantity": 22,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Túi xách nữ tối giản 03",
+    "category": "Túi xách, balo",
+    "priceVnd": 229000,
+    "imageUrl": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Trắng",
+    "stockQuantity": 85,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Balo laptop tối giản 04",
+    "category": "Túi xách, balo",
+    "priceVnd": 179000,
+    "imageUrl": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Trắng",
+    "stockQuantity": 46,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Balo mini tối giản 05",
+    "category": "Túi xách, balo",
+    "priceVnd": 119000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Be",
+    "stockQuantity": 48,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Balo thời trang tối giản 06",
+    "category": "Túi xách, balo",
+    "priceVnd": 349000,
+    "imageUrl": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=80",
+    "size": "Mini",
+    "color": "Be",
+    "stockQuantity": 53,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Túi đựng mỹ phẩm tối giản 07",
+    "category": "Túi xách, balo",
+    "priceVnd": 89000,
+    "imageUrl": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Nâu",
+    "stockQuantity": 86,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Túi du lịch tối giản 08",
+    "category": "Túi xách, balo",
+    "priceVnd": 179000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Nâu",
+    "stockQuantity": 87,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Balo đi học tối giản 09",
+    "category": "Túi xách, balo",
+    "priceVnd": 149000,
+    "imageUrl": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Hồng",
+    "stockQuantity": 15,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Túi đeo vai tối giản 10",
+    "category": "Túi xách, balo",
+    "priceVnd": 89000,
+    "imageUrl": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Hồng",
+    "stockQuantity": 115,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Túi tote nhiều ngăn 11",
+    "category": "Túi xách, balo",
+    "priceVnd": 229000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "Mini",
+    "color": "Xanh",
+    "stockQuantity": 4,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Túi đeo chéo nhiều ngăn 12",
+    "category": "Túi xách, balo",
+    "priceVnd": 229000,
+    "imageUrl": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Xanh",
+    "stockQuantity": 87,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Túi xách nữ nhiều ngăn 13",
+    "category": "Túi xách, balo",
+    "priceVnd": 229000,
+    "imageUrl": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Xám",
+    "stockQuantity": 8,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Balo laptop nhiều ngăn 14",
+    "category": "Túi xách, balo",
+    "priceVnd": 179000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Xám",
+    "stockQuantity": 7,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví nam tối giản 01",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 79000,
+    "imageUrl": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Đen",
+    "stockQuantity": 47,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví nữ tối giản 02",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 249000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Đen",
+    "stockQuantity": 116,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví mini tối giản 03",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 59000,
+    "imageUrl": "https://images.unsplash.com/photo-1622560480654-d96214fdc887?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Nâu",
+    "stockQuantity": 19,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Thắt lưng da tổng hợp tối giản 04",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 249000,
+    "imageUrl": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Nâu",
+    "stockQuantity": 36,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Thắt lưng khóa tự động tối giản 05",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 59000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Be",
+    "stockQuantity": 79,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví đựng thẻ tối giản 06",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 59000,
+    "imageUrl": "https://images.unsplash.com/photo-1622560480654-d96214fdc887?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Be",
+    "stockQuantity": 55,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví cầm tay tối giản 07",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 79000,
+    "imageUrl": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Đỏ",
+    "stockQuantity": 99,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví gấp tối giản 08",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 249000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Đỏ",
+    "stockQuantity": 99,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Thắt lưng casual tối giản 09",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 159000,
+    "imageUrl": "https://images.unsplash.com/photo-1622560480654-d96214fdc887?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Xanh navy",
+    "stockQuantity": 39,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví đựng tiền xu tối giản 10",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 199000,
+    "imageUrl": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Xanh navy",
+    "stockQuantity": 1,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví nam nhiều ngăn 11",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 99000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "M",
+    "color": "Xám",
+    "stockQuantity": 85,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví nữ nhiều ngăn 12",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 249000,
+    "imageUrl": "https://images.unsplash.com/photo-1622560480654-d96214fdc887?auto=format&fit=crop&w=900&q=80",
+    "size": "L",
+    "color": "Xám",
+    "stockQuantity": 98,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Ví mini nhiều ngăn 13",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 159000,
+    "imageUrl": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=900&q=80",
+    "size": "Freesize",
+    "color": "Bò",
+    "stockQuantity": 107,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Thắt lưng da tổng hợp nhiều ngăn 14",
+    "category": "Ví, thắt lưng",
+    "priceVnd": 129000,
+    "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80",
+    "size": "S",
+    "color": "Bò",
+    "stockQuantity": 33,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Áo khoác form rộng 15",
+    "category": "Quần áo",
+    "priceVnd": 259000,
+    "imageUrl": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80",
+    "size": "2XL",
+    "color": "Đen",
+    "stockQuantity": 116,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  },
+  {
+    "name": "Sandal phong cách Hàn Quốc 15",
+    "category": "Giày dép",
+    "priceVnd": 329000,
+    "imageUrl": "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=900&q=80",
+    "size": "42",
+    "color": "Trắng",
+    "stockQuantity": 102,
+    "description": "Dữ liệu mô phỏng — chưa xác minh là tên listing Shopee. Giá/size/màu/tồn kho không phải dữ liệu Shopee xác thực. Ảnh tham khảo; cần đối chiếu hoặc thay bằng ảnh sản phẩm có quyền sử dụng."
+  }
+]

@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Component
 public class ProductCatalogSeeder implements ApplicationRunner {
 
-    private static final String CATALOG_RESOURCE = "catalog/products-350.json";
+    private static final String CATALOG_RESOURCE = "catalog/products-100.json";
     private static final System.Logger LOGGER =
             System.getLogger(ProductCatalogSeeder.class.getName());
 
@@ -137,8 +137,8 @@ public class ProductCatalogSeeder implements ApplicationRunner {
     }
 
     private void validateSeeds(List<CatalogProductSeed> seeds) {
-        if (seeds == null || seeds.size() != 350) {
-            throw new IllegalStateException("Catalog phải chứa đúng 350 sản phẩm.");
+        if (seeds == null || seeds.size() != 100) {
+            throw new IllegalStateException("Catalog phải chứa đúng 100 sản phẩm.");
         }
 
         Set<String> identities = new HashSet<>();
