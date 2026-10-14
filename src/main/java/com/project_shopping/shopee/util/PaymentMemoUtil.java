@@ -1,12 +1,12 @@
 package com.project_shopping.shopee.util;
 
 import java.text.Normalizer;
-import java.util.Random;
+import java.security.SecureRandom;
 
 public final class PaymentMemoUtil {
 
     private static final String CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    private static final Random RANDOM = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private PaymentMemoUtil() {}
 
@@ -25,7 +25,7 @@ public final class PaymentMemoUtil {
     }
 
     /**
-     * Sinh mã ngẫu nhiên duy nhất (VD: K92F)
+     * Sinh mã ngẫu nhiên khó đoán (VD: K92F7Q2M).
      */
     public static String generateRandomCode(int length) {
         StringBuilder sb = new StringBuilder(length);

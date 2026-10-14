@@ -23,7 +23,7 @@ rectangle "BLUE THREAD / Shopee" {
   usecase "Confirm bank transfer" as UC_Payment
   usecase "Activate / deactivate users" as UC_Users
   usecase "View statistics" as UC_Statistics
-  usecase "Manage bank accounts" as UC_Banks
+  usecase "View / add bank accounts" as UC_Banks
 }
 
 Guest -- UC_Catalog

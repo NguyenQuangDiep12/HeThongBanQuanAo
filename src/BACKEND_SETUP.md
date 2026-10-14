@@ -1,10 +1,10 @@
 # E-Commerce Mini Backend
 
-Backend Spring Boot 3.5 / Java 21 / MySQL 8. API prefix: `/api`. Database changes are applied by Flyway on startup from `main/resources/db/migration`.
+Backend Spring Boot 3.5 / Java 21 / MySQL 8. API prefix: `/api`. Versioned Flyway scripts are present under `src/main/resources/db/migration`, but the checked-in runtime configuration currently disables Flyway and uses Hibernate `ddl-auto=update`.
 
 ## Run locally — backend only
 
-Open a PowerShell window for the backend:
+Open a PowerShell window for the backend. The `dev` profile is local-only and enables sample data; set the required secrets before starting:
 
 ```powershell
 cd C:\DAAAN\shopee\shopee
@@ -13,14 +13,15 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 $env:DB_USERNAME = 'root'
 $env:DB_PASSWORD = '<your-local-mysql-password>'
 $env:JWT_SECRET = '<a unique random secret of at least 32 bytes>'
-.\mvnw.cmd spring-boot:run
+$env:ADMIN_PASSWORD = '<a unique password of at least 8 characters>'
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-This starts only Spring Boot. The backend reads the database URL and application defaults from `src/main/resources/application.properties`; credentials and signing secrets come from environment variables. Start MySQL and ensure the configured `clotherwebsite` database exists. If `JWT_SECRET` is omitted, local development uses a newly generated temporary key and existing tokens become invalid after restart. Set a unique stable `JWT_SECRET` for deployments or multiple backend instances.
+This starts only Spring Boot. Local database defaults come from `application-dev.properties`; `DB_PASSWORD`, `JWT_SECRET`, and `ADMIN_PASSWORD` must be supplied. Start MySQL and ensure the configured `clotherwebsite` database exists. The API fails to start if `JWT_SECRET` is missing or shorter than 32 bytes. Outside `dev`/`test`, the production guard requires a non-root database account, a password, a JWT secret of at least 32 bytes, bootstrap admin credentials, and a `DB_URL` query parameter `sslMode=VERIFY_IDENTITY` backed by a trusted certificate. Configure these before deployment; do not activate the `dev` profile against production data.
 
-At startup, `AdminBootstrap` creates the initial admin when that email does not already exist. Local development defaults are `admin@local` / `123456`; set `ADMIN_EMAIL` and `ADMIN_PASSWORD` to override them. Use a stronger password outside a local development environment.
+At startup, `AdminBootstrap` creates the initial admin when that email does not already exist. In `dev`, the email defaults to `admin@local`; `ADMIN_PASSWORD` must be supplied. An existing admin's active state is preserved on restart.
 
-`DemoDataSeeder` prepares 20 sample customer accounts (`user@local`, `demo-user-02@local` … `demo-user-20@local`, password `123456` by default), 20 clothing products across the catalog categories, product size/color variants, and up to 20 sample rows in each customer-facing transaction table: carts/cart items, orders/order items, payments, and notifications. Orders use varied lifecycle states and sample addresses. Existing categories, products, variants, customer carts, and customer orders are preserved; missing sample rows are filled on startup. Sample orders are created only for sample users who do not already have orders. Override the first sample account with `DEMO_USER_EMAIL` and `DEMO_USER_PASSWORD`, or disable this with `BOOTSTRAP_DEMO_DATA=false`. Seeded customers all have the `USER` role. For a live TiDB database, enable seeding for one successful startup, then set `BOOTSTRAP_DEMO_DATA=false` and redeploy to stop creating sample rows for newly missing sample users.
+`DemoDataSeeder` prepares sample customer accounts, products, variants, carts, orders, payments, and notifications only in the `dev` profile. Its sample password defaults to `123456` only in that profile. Seeding is disabled outside `dev` and can be disabled locally with `BOOTSTRAP_DEMO_DATA=false`. Never activate the `dev` profile against a production database.
 
 Clean or build only the backend from this directory:
 

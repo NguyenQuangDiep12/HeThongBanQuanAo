@@ -34,6 +34,26 @@ flowchart LR
 
 Sơ đồ thể hiện quan hệ đã thấy trong source. Việc triển khai cụ thể có thể đặt frontend và backend cùng hoặc khác origin; origin CORS cấu hình được đọc từ `APP_CORS_ALLOWED_ORIGINS`.
 
+### UML Component Diagram
+
+![Sơ đồ component UML của frontend, backend và cơ sở dữ liệu](diagrams/component-architecture.png)
+
+Sơ đồ component thể hiện dependency từ các component giao diện React qua `frontend/src/services/*` và `frontend/src/api.js` tới chuỗi backend Spring Security, controllers, services, repositories và database. Nó thể hiện phụ thuộc `OrderService` → `PaymentTransactionService` cho checkout BANKING. Cơ sở dữ liệu được đặt ngoài package backend. Không vẽ cổng thanh toán hoặc client Univer vì không tìm thấy client tích hợp tương ứng trong source đã rà soát.
+
+**Căn cứ source:** `frontend/src/features/*`, `frontend/src/services/*`, `frontend/src/api.js` (frontend là thư mục sibling); `src/main/java/com/project_shopping/shopee/config/SecurityConfig.java`; `controller/*`; `service/OrderService.java`; `service/PaymentTransactionService.java`; `repository/*`; `model/*`; `src/main/resources/application.properties`.
+
+PlantUML source có thể chỉnh sửa: [`component-architecture.puml`](diagrams/component-architecture.puml).
+
+### UML Use Case Diagram
+
+![Sơ đồ use case UML của BLUE THREAD / Shopee](diagrams/use-case.png)
+
+Actor `Guest`, `Customer` và `Administrator` được đối chiếu với quyền public, `USER` và `ADMIN`. Use case là các nhóm mục tiêu người dùng có endpoint tương ứng; sơ đồ không hàm ý thêm quy tắc include/extend. Ranh giới quyền được xác minh trong `SecurityConfig`; các chức năng được đối chiếu với `AuthController`, `ProductController`, `CartController`, `OrderController`, `ReviewController`, `WishlistController`, `NotificationController` và các `Admin*Controller`.
+
+PlantUML source có thể chỉnh sửa: [`use-case.puml`](diagrams/use-case.puml).
+
+Quy ước hình dạng use case, activity partitions/decision nodes, state transitions, sequence lifelines/combined fragments và component dependencies được đối chiếu với [OMG UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF) và tài liệu chính thức của PlantUML cho [Use Case](https://plantuml.com/use-case-diagram), [Activity](https://plantuml.com/en/activity-diagram-beta), [State](https://plantuml.com/en/state-diagram), [Sequence](https://plantuml.com/en/sequence-diagram) và [Component](https://plantuml.com/component-diagram). Các ảnh PNG là biểu đồ đã vẽ theo ký hiệu UML; file `.puml` là nguồn văn bản để hiệu chỉnh.
+
 ## Công nghệ và cấu hình xác minh được
 
 | Lớp | Công nghệ / cấu hình | Bằng chứng |

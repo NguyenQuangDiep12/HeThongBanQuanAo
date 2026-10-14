@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+
 @Component
 public class AdminBootstrap implements ApplicationRunner {
 
@@ -47,11 +49,6 @@ public class AdminBootstrap implements ApplicationRunner {
 
         if (existingUser.isPresent()) {
             validateExistingUser(existingUser.get());
-            // The configured bootstrap admin must remain able to administer accounts.
-            // Existing rows may have received the new active column as FALSE during schema update.
-            if (!existingUser.get().isActive()) {
-                existingUser.get().setActive(true);
-            }
             return;
         }
 
@@ -63,6 +60,12 @@ public class AdminBootstrap implements ApplicationRunner {
         if (adminEmail.isBlank() || adminPassword.isBlank()) {
             throw new IllegalStateException(
                     "Cần cấu hình đồng thời ADMIN_EMAIL và ADMIN_PASSWORD để khởi tạo tài khoản quản trị."
+            );
+        }
+        int passwordBytes = adminPassword.getBytes(StandardCharsets.UTF_8).length;
+        if (adminPassword.length() < 8 || passwordBytes > 72) {
+            throw new IllegalStateException(
+                    "ADMIN_PASSWORD phải có ít nhất 8 ký tự và không vượt quá 72 byte UTF-8."
             );
         }
     }

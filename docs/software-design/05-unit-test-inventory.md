@@ -12,7 +12,7 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 
 - **Module / vị trí:** đặt hàng; `src/main/java/com/project_shopping/shopee/service/OrderService.java:41`.
 - **Đầu vào / đầu ra:** email user + `CheckoutRequest(shippingAddress, phone, paymentMethod)` → `OrderResponse`.
-- **Logic cần bao phủ:** cart vắng hoặc rỗng; cart có nhiều variant; variant lock thiếu; product INACTIVE; stock vừa đủ / thiếu; total dùng variant price; địa chỉ/phone trim; order PENDING; snapshot line; trừ tồn; payment COD/BANKING; BANKING tạo transaction; cart clear và updatedAt.
+- **Logic cần bao phủ:** user không tìm thấy → 401; cart vắng hoặc rỗng; cart có nhiều variant; variant lock thiếu; product INACTIVE; stock vừa đủ / thiếu; total dùng variant price; địa chỉ/phone trim; order PENDING; snapshot line; trừ tồn; payment COD/BANKING; BANKING tạo transaction; cart clear và updatedAt.
 - **Mock/fixture:** UserRepository, CartRepository, VariantRepository, OrderRepository, PaymentTransactionService, PaymentTransactionRepository, NotificationRepository; fixture với nhiều variant và order item.
 - **Case bất thường:** lỗi khi tạo transaction/lưu order/variant xảy ra thì kiểm tra rollback ở integration test; variant/cart bị xóa; tồn đổi trước checkout; tổng BigDecimal scale/giá lớn; cart line quantity <=0 chỉ kiểm qua DTO/persistence vì service nhận được object bất kỳ.
 - **Ưu tiên / lý do:** P0 — một lỗi có thể ghi sai tổng tiền, trừ sai stock hoặc xóa giỏ mà không tạo đơn.

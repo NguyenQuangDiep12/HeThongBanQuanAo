@@ -55,9 +55,13 @@ public class OrderService {
             if (variant.getProduct().getStatus() != ProductStatus.ACTIVE) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giỏ hàng có sản phẩm đã ngừng kinh doanh. Vui lòng cập nhật giỏ hàng.");
             }
-            if (item.getQuantity() > variant.getStockQuantity()) {
+            if (item.getQuantity() <= 0
+                    || variant.getStockQuantity() < 0
+                    || item.getQuantity() > variant.getStockQuantity()
+                    || variant.getPrice() == null
+                    || variant.getPrice().signum() <= 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Số lượng tồn kho không đủ cho một sản phẩm trong giỏ hàng. Vui lòng cập nhật số lượng.");
+                        "Số lượng hoặc giá của một sản phẩm trong giỏ hàng không hợp lệ. Vui lòng cập nhật giỏ hàng.");
             }
             lockedVariants.put(variant.getId(), variant);
         }
@@ -66,6 +70,9 @@ public class OrderService {
                 .map(item -> lockedVariants.get(item.getVariant().getId()).getPrice()
                         .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (total.signum() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tổng tiền đơn hàng không hợp lệ.");
+        }
         CustomerOrder order = new CustomerOrder(user, request.shippingAddress().trim(), request.phone().trim(), total);
         for (CartItem item : cart.getItems()) {
             ProductVariant variant = lockedVariants.get(item.getVariant().getId());
@@ -172,6 +179,11 @@ public class OrderService {
     private OrderResponse cancelPendingOrder(CustomerOrder order) {
         requireStatus(order, OrderStatus.PENDING, "Chỉ đơn hàng đang chờ xác nhận mới có thể được hủy.");
         Instant cancelledAt = timestampAfter(order.getCreatedAt());
+        paymentTransactionRepository.findAllByOrderIdForUpdate(order.getId()).stream()
+                .filter(transaction -> transaction.getStatus()
+                        == PaymentTransaction.TransactionStatus.PENDING)
+                .forEach(transaction -> transaction.setStatus(
+                        PaymentTransaction.TransactionStatus.REJECTED));
         restoreInventory(order);
         order.setStatus(OrderStatus.CANCELLED);
         order.setCancelledAt(cancelledAt);
@@ -190,7 +202,16 @@ public class OrderService {
         }
         for (OrderItem line : order.getItems()) {
             ProductVariant variant = lockedVariants.get(line.getVariant().getId());
-            variant.setStockQuantity(Math.addExact(variant.getStockQuantity(), line.getQuantity()));
+            if (line.getQuantity() <= 0 || variant.getStockQuantity() < 0) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Dữ liệu tồn kho hoặc số lượng trong đơn hàng không hợp lệ.");
+            }
+            try {
+                variant.setStockQuantity(Math.addExact(variant.getStockQuantity(), line.getQuantity()));
+            } catch (ArithmeticException exception) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Không thể khôi phục tồn kho do vượt giới hạn số lượng.");
+            }
         }
     }
 
@@ -240,7 +261,7 @@ public class OrderService {
         Payment payment = order.getPayment();
         String transferMemo = null;
         if (payment != null && payment.getPaymentMethod() == com.project_shopping.shopee.model.enums.PaymentMethod.BANKING) {
-            transferMemo = paymentTransactionRepository.findByOrderId(order.getId())
+            transferMemo = paymentTransactionRepository.findFirstByOrderIdOrderByCreatedAtDesc(order.getId())
                     .map(com.project_shopping.shopee.model.PaymentTransaction::getTransferMemo)
                     .orElse(null);
         }

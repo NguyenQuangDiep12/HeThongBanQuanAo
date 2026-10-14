@@ -210,3 +210,39 @@ Frontend input checks không thay thế backend DTO validation. Nguồn: `fronte
 - Spring Data derived queries và JPQL repository là giao diện đến persistence; trong unit test có thể mock. Query semantics, `EntityGraph`, unique constraints, migration và cascade cần persistence integration test riêng.
 - Cần `Clock`/time seam để kiểm thử chính xác timestamp nếu muốn assertion ổn định; hiện service gọi `Instant.now()` trực tiếp.
 
+## 10. Biểu đồ Activity cho checkout
+
+![Activity Diagram mô tả luồng checkout và các nhánh lỗi](diagrams/activity-checkout.png)
+
+Activity partition tách khách hàng, HTTP API/bảo mật và xử lý checkout/persistence. Các nhánh thể hiện quyền `USER` và `@Valid`, user không tìm thấy (401), giỏ thiếu/rỗng, biến thể thiếu hoặc sản phẩm không ACTIVE/tồn không đủ, phương thức BANKING và kết thúc thành công. `OrderController.checkout` gắn HTTP 201; `OrderService.checkout` chạy trong transaction, khóa giỏ/biến thể và xóa dòng giỏ sau khi tạo đơn. Lỗi cụ thể từ từng guard được thể hiện theo các `ResponseStatusException` trong service.
+
+**Nguồn:** `controller/OrderController.java:24-34`; `config/SecurityConfig.java`; `service/OrderService.java:41-110`; `service/PaymentTransactionService.java:createTransactionForOrder`; `dto/ApiDtos.java:CheckoutRequest`.
+
+PlantUML source: [`activity-checkout.puml`](diagrams/activity-checkout.puml).
+
+## 11. Biểu đồ State Machine cho đơn hàng
+
+![State Machine Diagram cho OrderStatus và ghi chú status thanh toán](diagrams/state-order-payment.png)
+
+Các state `PENDING`, `CONFIRMED`, `SHIPPING`, `DELIVERED`, `COMPLETED`, `CANCELLED` khớp enum `OrderStatus`. Luồng có guard ở `OrderService`: hủy chỉ nhận `PENDING`, các chuyển tiếp giao hàng cần trạng thái trước tương ứng, và xác nhận nhận hàng kiểm tra chủ đơn. Ghi chú riêng nêu đường xác nhận BANKING đặt order thành `CONFIRMED` mà không kiểm tra trạng thái trước; đây là hành vi hiện tại của `PaymentTransactionService.confirmPaymentByAdmin`, không phải luật suy diễn của sơ đồ chuẩn.
+
+Sơ đồ chính mô tả lifecycle order. `PaymentStatus` và `PaymentTransaction.TransactionStatus` chỉ được ghi chú riêng vì chúng có enum trạng thái riêng; source hiện quan sát thấy các cập nhật `PENDING`/`PAID` và `PENDING`/`CONFIRMED`, không thấy mã đặt `FAILED`/`REJECTED`.
+
+**Nguồn:** `model/enums/OrderStatus.java`; `model/enums/PaymentStatus.java`; `model/PaymentTransaction.java`; `service/OrderService.java:41,113-206`; `service/PaymentTransactionService.java:76-105`.
+
+PlantUML source: [`state-order-payment.puml`](diagrams/state-order-payment.puml).
+
+## 12. Biểu đồ Sequence cho đăng nhập
+
+![Sequence Diagram thể hiện đăng nhập và các kết quả xác thực](diagrams/sequence-login.png)
+
+Lifeline gom `authService.js` và `api.js` thành HTTP client phía trình duyệt, và gom Spring Security/MVC thành biên API. Combined fragment `alt` ghi riêng: không tìm thấy user → 401; sai mật khẩu → 401; đúng mật khẩu nhưng tài khoản inactive → 403; đúng và active → tạo JWT, trả `AuthResponse`, lưu session và điều hướng theo role/redirect an toàn. Khi có lỗi, API client từ chối promise và `AuthPage` hiển thị toast.
+
+**Nguồn:** `frontend/src/features/auth/AuthPage.jsx`, `frontend/src/services/authService.js`, `frontend/src/api.js` (frontend sibling); `controller/AuthController.java:31-38`; `controller/ApiExceptionHandler.java`; `service/AuthService.java:66-100`; `repository/UserRepository.java`; `security/JwtService.java`.
+
+PlantUML source: [`sequence-login.puml`](diagrams/sequence-login.puml).
+
+### Căn cứ ký hiệu và giới hạn
+
+Các node hình tròn/đích là initial/final, hình thoi là decision/merge, khung `alt` là các operand thay thế, và các mũi tên nét đứt là message return/dependency theo ngữ nghĩa biểu đồ tương ứng. Quy ước được đối chiếu với [OMG UML 2.5.1](https://www.omg.org/spec/UML/2.5.1/PDF) và hướng dẫn chính thức PlantUML về [Activity](https://plantuml.com/en/activity-diagram-beta), [State](https://plantuml.com/en/state-diagram), [Sequence](https://plantuml.com/en/sequence-diagram). Sơ đồ mô tả phần source đã xác minh, không thay thế hợp đồng giao diện cho frontend sibling chưa xác nhận cùng phiên bản.
+

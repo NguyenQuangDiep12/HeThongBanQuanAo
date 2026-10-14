@@ -4,8 +4,10 @@ import com.project_shopping.shopee.model.BankAccount;
 import com.project_shopping.shopee.repository.BankAccountRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Profile;
 
 @Component
+@Profile("dev")
 public class BankDataInitializer implements CommandLineRunner {
 
     private final BankAccountRepository bankAccountRepository;

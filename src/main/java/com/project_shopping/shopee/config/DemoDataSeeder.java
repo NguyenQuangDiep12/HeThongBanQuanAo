@@ -27,6 +27,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -40,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Component
+@Profile("dev")
 public class DemoDataSeeder implements ApplicationRunner {
 
     private static final int DEMO_RECORD_COUNT = 20;
@@ -173,7 +175,7 @@ public class DemoDataSeeder implements ApplicationRunner {
             NotificationRepository notifications,
             UserRepository users,
             PasswordEncoder passwordEncoder,
-            @Value("${app.bootstrap.demo-data.enabled:true}") boolean enabled,
+            @Value("${app.bootstrap.demo-data.enabled:false}") boolean enabled,
             @Value("${app.bootstrap-demo-user.email:user@local}") String demoUserEmail,
             @Value("${app.bootstrap-demo-user.password:123456}") String demoUserPassword) {
 

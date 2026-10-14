@@ -3,8 +3,7 @@ package com.project_shopping.shopee.controller;
 import com.project_shopping.shopee.dto.BankDtos.BankAccountRequest;
 import com.project_shopping.shopee.dto.BankDtos.BankAccountResponse;
 import com.project_shopping.shopee.dto.BankDtos.PaymentTransactionResponse;
-import com.project_shopping.shopee.model.BankAccount;
-import com.project_shopping.shopee.repository.BankAccountRepository;
+import com.project_shopping.shopee.service.BankAccountService;
 import com.project_shopping.shopee.service.PaymentTransactionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -23,12 +22,12 @@ import java.util.List;
 @RequestMapping("/api/admin")
 public class AdminBankController {
 
-    private final BankAccountRepository bankAccountRepository;
+    private final BankAccountService bankAccountService;
     private final PaymentTransactionService transactionService;
 
-    public AdminBankController(BankAccountRepository bankAccountRepository,
+    public AdminBankController(BankAccountService bankAccountService,
                                PaymentTransactionService transactionService) {
-        this.bankAccountRepository = bankAccountRepository;
+        this.bankAccountService = bankAccountService;
         this.transactionService = transactionService;
     }
 
@@ -36,29 +35,13 @@ public class AdminBankController {
     @PostMapping("/bank-accounts")
     @ResponseStatus(HttpStatus.CREATED)
     public BankAccountResponse saveBankAccount(@Valid @RequestBody BankAccountRequest request) {
-        bankAccountRepository.findAll().forEach(b -> b.setActive(false));
-
-        BankAccount bank = new BankAccount(
-                request.bankCode().trim().toUpperCase(),
-                request.bankName().trim(),
-                request.accountNo().trim(),
-                request.accountName().trim().toUpperCase(),
-                request.qrTemplate()
-        );
-        BankAccount saved = bankAccountRepository.save(bank);
-        return new BankAccountResponse(
-                saved.getId(), saved.getBankCode(), saved.getBankName(),
-                saved.getAccountNo(), saved.getAccountName(), saved.getQrTemplate(), saved.isActive()
-        );
+        return bankAccountService.saveActiveAccount(request);
     }
 
     // 2. Lấy danh sách ngân hàng
     @GetMapping("/bank-accounts")
     public List<BankAccountResponse> listBankAccounts() {
-        return bankAccountRepository.findAll().stream()
-                .map(b -> new BankAccountResponse(b.getId(), b.getBankCode(), b.getBankName(),
-                        b.getAccountNo(), b.getAccountName(), b.getQrTemplate(), b.isActive()))
-                .toList();
+        return bankAccountService.listAccounts();
     }
 
     // 3. Lấy toàn bộ lịch sử thanh toán phục vụ đổ dữ liệu cho Univer Sheet Engine

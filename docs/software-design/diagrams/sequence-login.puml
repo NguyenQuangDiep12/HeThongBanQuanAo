@@ -3,7 +3,7 @@ autonumber
 actor Customer
 participant "AuthPage.jsx" as UI
 participant "authService.js / api.js" as Client
-participant "Spring Security + AuthController" as API
+participant "Spring Security + MVC\n(AuthController / ApiExceptionHandler)" as API
 participant "AuthService" as Auth
 participant "UserRepository / Database" as Users
 participant "PasswordEncoder" as Encoder

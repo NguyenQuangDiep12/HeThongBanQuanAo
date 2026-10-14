@@ -1,16 +1,21 @@
 package com.project_shopping.shopee.controller;
 
 import com.project_shopping.shopee.dto.ApiDtos.ErrorResponse;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
 import java.util.Map;
@@ -91,6 +96,42 @@ public class ApiExceptionHandler {
                 HttpStatus.CONFLICT,
                 "Dữ liệu không thể lưu do bị trùng hoặc vi phạm ràng buộc. Vui lòng kiểm tra lại."
         );
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(
+            NoResourceFoundException exception) {
+        return createErrorResponse(HttpStatus.NOT_FOUND, "Không tìm thấy đường dẫn yêu cầu.");
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(
+            HttpRequestMethodNotSupportedException exception) {
+        return createErrorResponse(HttpStatus.METHOD_NOT_ALLOWED,
+                "Phương thức HTTP không được hỗ trợ cho đường dẫn này.");
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMediaTypeNotSupported(
+            HttpMediaTypeNotSupportedException exception) {
+        return createErrorResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                "Định dạng nội dung gửi lên không được hỗ trợ.");
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
+    public ResponseEntity<ErrorResponse> handleMediaTypeNotAcceptable(
+            HttpMediaTypeNotAcceptableException exception) {
+        return createErrorResponse(HttpStatus.NOT_ACCEPTABLE,
+                "Định dạng phản hồi được yêu cầu không được hỗ trợ.");
+    }
+
+    @ExceptionHandler(ConcurrencyFailureException.class)
+    public ResponseEntity<ErrorResponse> handleConcurrencyFailure(
+            ConcurrencyFailureException exception) {
+        LOGGER.log(System.Logger.Level.WARNING,
+                "Yêu cầu không thể hoàn tất do tranh chấp khóa cơ sở dữ liệu.", exception);
+        return createErrorResponse(HttpStatus.SERVICE_UNAVAILABLE,
+                "Dữ liệu đang được cập nhật bởi yêu cầu khác. Vui lòng thử lại.");
     }
 
     @ExceptionHandler(Exception.class)
@@ -191,7 +232,11 @@ public class ApiExceptionHandler {
             case UNAUTHORIZED -> "Chưa đăng nhập";
             case FORBIDDEN -> "Không có quyền truy cập";
             case NOT_FOUND -> "Không tìm thấy dữ liệu";
+            case METHOD_NOT_ALLOWED -> "Phương thức không được hỗ trợ";
+            case NOT_ACCEPTABLE -> "Định dạng phản hồi không được hỗ trợ";
+            case UNSUPPORTED_MEDIA_TYPE -> "Định dạng nội dung không được hỗ trợ";
             case CONFLICT -> "Dữ liệu bị xung đột";
+            case SERVICE_UNAVAILABLE -> "Dịch vụ tạm thời không khả dụng";
             case INTERNAL_SERVER_ERROR -> "Lỗi hệ thống";
             default -> "Yêu cầu không thể xử lý";
         };

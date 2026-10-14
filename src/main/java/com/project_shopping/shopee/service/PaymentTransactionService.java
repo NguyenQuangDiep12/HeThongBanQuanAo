@@ -55,13 +55,25 @@ public class PaymentTransactionService {
             cleanName += "PLUS";
         }
 
-        String randomCode = PaymentMemoUtil.generateRandomCode(4);
-        long amountInt = order.getTotalAmount().longValue();
-        String transferMemo = String.format("%s %s %d", cleanName, randomCode, amountInt);
+        String randomCode = PaymentMemoUtil.generateRandomCode(8);
+        long amountInt;
+        try {
+            amountInt = order.getTotalAmount().toBigIntegerExact().longValueExact();
+        } catch (ArithmeticException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Tổng tiền chuyển khoản phải là số nguyên VND."
+            );
+        }
 
-        BankAccount activeBank = bankAccountRepository.findFirstByActiveTrueOrderByIdDesc().orElse(null);
-        String bankAccountNo = activeBank != null ? activeBank.getAccountNo() : "N/A";
+        BankAccount activeBank = bankAccountRepository.findFirstByActiveTrueOrderByIdDesc()
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Chưa cấu hình tài khoản ngân hàng nhận thanh toán."
+                ));
+        String bankAccountNo = activeBank.getAccountNo();
         String orderCode = "BT-" + String.format("%05d", order.getId());
+        String transferMemo = String.format("%s %s %s %d", orderCode, cleanName, randomCode, amountInt);
 
         PaymentTransaction tx = new PaymentTransaction(
                 order, orderCode, cleanName, randomCode, transferMemo, order.getTotalAmount(), bankAccountNo
@@ -74,23 +86,35 @@ public class PaymentTransactionService {
      */
     @Transactional
     public PaymentTransactionResponse confirmPaymentByAdmin(Long transactionId) {
-        PaymentTransaction tx = transactionRepository.findById(transactionId)
+        Long orderId = transactionRepository.findOrderIdById(transactionId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy giao dịch."));
+        CustomerOrder order = orderRepository.findByIdForUpdate(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đơn hàng."));
+        PaymentTransaction tx = transactionRepository.findByIdForUpdate(transactionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy giao dịch."));
 
-        if (tx.getStatus() == TransactionStatus.CONFIRMED) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giao dịch này đã được xác nhận trước đó.");
+        if (tx.getStatus() != TransactionStatus.PENDING) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Giao dịch không ở trạng thái chờ xác nhận.");
+        }
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Đơn hàng không còn ở trạng thái chờ xác nhận.");
+        }
+        if (order.getPayment() == null
+                || order.getPayment().getPaymentMethod() != com.project_shopping.shopee.model.enums.PaymentMethod.BANKING) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Đơn hàng không có phương thức thanh toán chuyển khoản.");
         }
 
+        order = orderRepository.findDetailedById(orderId).orElse(order);
+        Instant confirmedAt = Instant.now();
         tx.setStatus(TransactionStatus.CONFIRMED);
-        tx.setConfirmedAt(Instant.now());
+        tx.setConfirmedAt(confirmedAt);
 
         // Đồng bộ đổi trạng thái đơn hàng sang CONFIRMED và Payment sang PAID
-        CustomerOrder order = tx.getOrder();
         order.setStatus(OrderStatus.CONFIRMED);
-        order.setConfirmedAt(Instant.now());
+        order.setConfirmedAt(confirmedAt);
         if (order.getPayment() != null) {
             order.getPayment().setPaymentStatus(PaymentStatus.PAID);
-            order.getPayment().setPaidAt(Instant.now());
+            order.getPayment().setPaidAt(confirmedAt);
         }
 
         orderRepository.save(order);
