@@ -2,8 +2,6 @@
 
 ## Nguồn schema và cách diễn giải
 
-Các đường dẫn backend trong tài liệu này được tính từ thư mục `shopee/`.
-
 Entity JPA trong `src/main/java/com/project_shopping/shopee/model` là mô hình được ứng dụng map. SQL migrations V1–V9 trong `src/main/resources/db/migration` ghi lại các kiểu, khóa, index và thay đổi schema theo lịch sử. Tuy nhiên `src/main/resources/application.properties` hiện cấu hình `spring.flyway.enabled=false` cùng `spring.jpa.hibernate.ddl-auto=update`; vì vậy migrations không chạy theo cấu hình mặc định đã commit. Các bảng/kiểu MySQL dưới đây được xác minh từ SQL migration khi có migration tương ứng; nơi chỉ có mapping JPA, kiểu SQL chính xác là **suy ra theo dialect MySQL**.
 
 `src/BACKEND_SETUP.md` và properties đều ghi Flyway tắt; production database thực tế và migration history chưa thể xác minh. Test profile dùng H2 `MODE=MySQL`, `ddl-auto=create-drop`, Flyway off. Không có file dump/schema môi trường thật.

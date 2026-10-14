@@ -2,8 +2,6 @@
 
 ## Quy ước chung
 
-Các đường dẫn backend trong tài liệu này được tính từ thư mục `shopee/`; đường dẫn frontend bắt đầu bằng `frontend/`.
-
 Backend dùng REST controllers dưới `/api`, trao đổi JSON. Endpoint được xác minh từ annotation trong `src/main/java/com/project_shopping/shopee/controller`. Trạng thái thành công dưới đây theo `@ResponseStatus`; khi method không ghi status, Spring mặc định trả 200 cho response body. Những endpoint `void` có `NO_CONTENT` trả 204.
 
 ### Xác thực và phân quyền
@@ -15,7 +13,7 @@ Backend dùng REST controllers dưới `/api`, trao đổi JSON. Endpoint đư�
 - `/api/cart/**`, `/api/orders/**`, `/api/notifications/**`, `/api/wishlist/**` yêu cầu USER.
 - `/api/auth/me` yêu cầu USER hoặc ADMIN.
 - Các API còn lại yêu cầu authenticated; `POST /api/products/{productId}/reviews` còn kiểm role USER trong service.
-- CORS chỉ đăng ký `/api/**`; origins từ `APP_CORS_ALLOWED_ORIGINS` (mặc định localhost:5173), methods GET/POST/PUT/PATCH/DELETE/OPTIONS, headers Authorization/Content-Type/Accept, max-age 3600.
+- CORS chỉ đăng ký `/api/**`; origins từ `APP_CORS_ALLOWED_ORIGINS` (mặc định localhost:5173, localhost:5199), methods GET/POST/PUT/PATCH/DELETE/OPTIONS, headers Authorization/Content-Type/Accept, max-age 3600.
 
 ### Lỗi chung
 
@@ -120,7 +118,7 @@ Response DTO tránh trả entity/password. Order response có status timeline, o
 
 ## Giao diện frontend ↔ backend
 
-`frontend/src/api.js` ghép base URL (mặc định rỗng) với `/api`, gắn Authorization nếu có token và parse JSON. Frontend services gọi các module gồm hồ sơ, reviews, wishlist, order lifecycle và admin stats. Vite proxy local tại `frontend/vite.config.js` forward `/api` sang cổng 8082. `frontend/UI_SPEC.md` còn một số mô tả cũ về hồ sơ/review API và vòng đời order rút gọn; source hiện hành là bằng chứng mới hơn.
+`frontend/src/api.js` ghép base URL (mặc định rỗng) với `/api`, gắn Authorization nếu có token và parse JSON. Frontend services hiện gọi tất cả module kể trên gồm hồ sơ, reviews, wishlist, order lifecycle và admin stats. Vite proxy local tại `frontend/vite.config.js` forward `/api` sang cổng 8082. Tài liệu `frontend/UI_SPEC.md` chứa mô tả cũ về backend port 8080, không có hồ sơ/review API và vòng đời order rút gọn; source và Vite config hiện hành là bằng chứng mới hơn.
 
 **Chưa xác định:** OpenAPI contract, versioning, pagination cho admin lists, giới hạn tốc độ, idempotency key cho checkout, API refund, xử lý callback thanh toán và hợp đồng chính xác với Univer/Sheet.
 

@@ -2,8 +2,6 @@
 
 ## Mục tiêu và phạm vi
 
-Các đường dẫn backend trong tài liệu này được tính từ thư mục `shopee/`; đường dẫn frontend bắt đầu bằng `frontend/`.
-
 Danh mục ưu tiên các nhánh có nghiệp vụ, dữ liệu, quyền hoặc side effect. Backend hiện có `CriticalBusinessFlowTests`, `AdminBootstrapTest`, `ProductionConfigurationGuardTest` và `ShopeeApplicationTests`; test luồng nghiệp vụ chính chạy MockMvc với profile H2. Frontend `package.json` không khai báo test script/test runner. Các mục dưới đây bổ sung phạm vi còn cần bao phủ, không thay thế kiểm thử tích hợp MySQL/concurrency.
 
 Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, case bất thường và ưu tiên. **P0** là logic có thể làm sai tiền/tồn/trạng thái đơn; **P1** là xác thực/quyền/dữ liệu catalog và luồng mua; **P2** là logic hỗ trợ, báo cáo và xử lý lỗi; **P3** là khởi tạo hoặc giao diện ít rủi ro hơn. Mức ưu tiên là đề xuất dựa trên tác động nếu sai, không phải phân loại do source khai báo.

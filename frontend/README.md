@@ -22,4 +22,4 @@ Frontend không dùng package/script điều phối từ thư mục cha.
 
 ## Deploy frontend trên Vercel
 
-Chọn thư mục `frontend` làm Root Directory, dùng lệnh build `pnpm run build` và thư mục output `dist`. Khai báo biến build `VITE_API_BASE_URL` bằng origin backend đang chạy, ví dụ `https://api.example.com` (không thêm `/api`). Backend phải cho phép origin frontend qua `APP_CORS_ALLOWED_ORIGINS` và phải kết nối được tới database có catalog. Vercel chỉ phục vụ frontend tĩnh; việc nạp catalog được backend thực hiện khi khởi động, không phải do Vercel chạy.
+Chọn thư mục `frontend` làm Root Directory, dùng lệnh build `npm run build` và thư mục output `dist`. Khai báo biến build `VITE_API_BASE_URL` bằng origin backend đang chạy, ví dụ `https://api.example.com` (không thêm `/api`). Backend phải cho phép origin frontend qua `APP_CORS_ALLOWED_ORIGINS` và phải kết nối được tới database có catalog. Vercel chỉ phục vụ frontend tĩnh; việc nạp 350 sản phẩm được backend thực hiện khi khởi động, không phải do Vercel chạy.

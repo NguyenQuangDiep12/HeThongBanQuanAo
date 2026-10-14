@@ -2,15 +2,15 @@
 
 ## Mục đích và phạm vi
 
-Tài liệu mô tả kiến trúc hiện tại của BLUE THREAD, một cửa hàng thời trang trực tuyến. Repo chứa frontend React trong `frontend/` và backend Spring Boot trong `shopee/`. Các kết luận được đánh dấu là **đã xác minh trong mã**, **được tài liệu dự án xác nhận**, **suy ra từ cách triển khai**, hoặc **chưa xác định**.
+Tài liệu mô tả kiến trúc đang có của BLUE THREAD, một cửa hàng thời trang trực tuyến. Repo hiện tại chứa backend Spring Boot tại thư mục gốc; frontend React được tài liệu backend dẫn tới và đang có source tại thư mục sibling `C:\DAAAN\shopee\frontend`. Sơ đồ và mô tả phía frontend dựa trên source sibling đó. Các kết luận được đánh dấu là **đã xác minh trong mã**, **được tài liệu dự án xác nhận**, **suy ra từ cách triển khai**, hoặc **chưa xác định**.
 
 ## Tóm tắt kiến trúc
 
 Ứng dụng dùng kiến trúc client–server, backend phân lớp. Trình duyệt chạy React/Vite và gọi REST API JSON dưới tiền tố `/api`. Backend Spring MVC tiếp nhận request, Spring Security xử lý JWT và role, controller chuyển tới service nghiệp vụ, service dùng Spring Data JPA repository để đọc/ghi cơ sở dữ liệu quan hệ.
 
-**Đã xác minh trong mã:** backend là Java 21 / Spring Boot 3.5.11 với Spring Web, Data JPA, Security, Validation, MySQL Connector/J và JJWT; dependency được khai báo trong `shopee/pom.xml`. Frontend khai báo React 19, React Router 7 và Vite 6 trong `frontend/package.json`. `frontend/vite.config.js` chạy frontend ở cổng 5173 và proxy `/api` tới `http://localhost:8082`.
+**Đã xác minh trong mã:** backend là Java 21 / Spring Boot 3.5.11 với Spring Web, Data JPA, Security, Validation, MySQL Connector/J và JJWT; dependency được khai báo trong `pom.xml`. Frontend khai báo React 19, React Router 7 và Vite 6 trong `frontend/package.json`. `frontend/vite.config.js` chạy frontend ở cổng 5199 và proxy `/api` tới `http://localhost:8082`.
 
-**Được tài liệu dự án xác nhận:** `shopee/src/BACKEND_SETUP.md` mô tả MySQL 8 và frontend là project riêng. Tài liệu và `shopee/src/main/resources/application.properties` đều xác nhận Flyway hiện tắt, Hibernate dùng `ddl-auto=update`. Do đó source có các migration nhưng cấu hình mặc định đã commit không tự áp dụng chúng. Schema thực tế của môi trường triển khai chưa thể xác minh từ repo.
+**Được tài liệu dự án xác nhận:** `src/BACKEND_SETUP.md` gọi backend là e-commerce mini backend, mô tả MySQL 8 và frontend là project riêng. Tài liệu và `src/main/resources/application.properties` đều xác nhận Flyway hiện tắt, Hibernate dùng `ddl-auto=update`. Do đó source có các migration nhưng cấu hình mặc định đã commit không tự áp dụng chúng. Schema thực tế của môi trường triển khai chưa thể xác minh từ repo.
 
 ## Sơ đồ kiến trúc
 
@@ -42,7 +42,7 @@ Sơ đồ thể hiện quan hệ đã thấy trong source. Việc triển khai c
 
 Sơ đồ component thể hiện dependency từ các component giao diện React qua `frontend/src/services/*` và `frontend/src/api.js` tới chuỗi backend Spring Security, controllers, services, repositories và database. Nó thể hiện phụ thuộc `OrderService` → `PaymentTransactionService` cho checkout BANKING. Cơ sở dữ liệu được đặt ngoài package backend. Không vẽ cổng thanh toán hoặc client Univer vì không tìm thấy client tích hợp tương ứng trong source đã rà soát.
 
-**Căn cứ source:** `frontend/src/features/*`, `frontend/src/services/*`, `frontend/src/api.js`; `shopee/src/main/java/com/project_shopping/shopee/config/SecurityConfig.java`; `controller/*`; `service/OrderService.java`; `service/PaymentTransactionService.java`; `repository/*`; `model/*`; `shopee/src/main/resources/application.properties`.
+**Căn cứ source:** `frontend/src/features/*`, `frontend/src/services/*`, `frontend/src/api.js` (frontend là thư mục sibling); `src/main/java/com/project_shopping/shopee/config/SecurityConfig.java`; `controller/*`; `service/OrderService.java`; `service/PaymentTransactionService.java`; `repository/*`; `model/*`; `src/main/resources/application.properties`.
 
 PlantUML source có thể chỉnh sửa: [`component-architecture.puml`](diagrams/component-architecture.puml).
 
@@ -61,11 +61,11 @@ Quy ước hình dạng use case, activity partitions/decision nodes, state tran
 | Lớp | Công nghệ / cấu hình | Bằng chứng |
 |---|---|---|
 | Frontend | JavaScript ES modules, React 19, React DOM, React Router 7, Vite 6, Tailwind CSS 4 qua Vite plugin, Lucide React | `frontend/package.json`, `frontend/vite.config.js` |
-| Backend | Java 21, Spring Boot 3.5.11, Spring Web MVC, Spring Data JPA, Spring Security, Jakarta Validation, Lombok | `shopee/pom.xml`, `shopee/src/main/java/com/project_shopping/shopee/` |
-| Xác thực | JWT qua JJWT 0.12.6, mật khẩu qua BCryptPasswordEncoder | `shopee/pom.xml`, `config/SecurityConfig.java`, `security/JwtService.java` |
-| Database | MySQL JDBC driver; URL local mặc định trỏ `localhost:3306/clotherwebsite`; test profile dùng H2 in-memory | `shopee/src/main/resources/application.properties`, `shopee/src/test/resources/application-test.properties` |
+| Backend | Java 21, Spring Boot 3.5.11, Spring Web MVC, Spring Data JPA, Spring Security, Jakarta Validation, Lombok | `pom.xml`, `src/main/java/com/project_shopping/shopee/` |
+| Xác thực | JWT qua JJWT 0.12.6, mật khẩu qua BCryptPasswordEncoder | `pom.xml`, `config/SecurityConfig.java`, `security/JwtService.java` |
+| Database | MySQL JDBC driver; URL local mặc định trỏ `localhost:3306/clotherwebsite`; test profile dùng H2 in-memory | `application.properties`, `src/test/resources/application-test.properties` |
 | Schema | JPA entity mapping; có Flyway scripts V1–V9 nhưng Flyway bị tắt trong application properties | `application.properties`, `db/migration/` |
-| Build backend | Maven Wrapper; Dockerfile build bằng Maven 3.9.9 / Eclipse Temurin 21, runtime JRE 21 | `shopee/pom.xml`, `shopee/mvnw.cmd`, `shopee/Dockerfile` |
+| Build backend | Maven Wrapper; Dockerfile build bằng Maven 3.9.9 / Eclipse Temurin 21, runtime JRE 21 | `pom.xml`, `mvnw.cmd`, `Dockerfile` |
 | Build frontend | npm scripts: `dev`, `build`, `preview`, `clean`; lockfile pnpm có trong sibling frontend | `frontend/package.json`, `frontend/pnpm-lock.yaml` |
 
 **Chưa xác định:** cơ sở dữ liệu thực của môi trường đã triển khai, biến môi trường production, pipeline CI/CD, host frontend, và việc Flyway có được bật bằng cấu hình ngoài `application.properties` hay không. Source chỉ chứng minh cấu hình mặc định đã commit.
@@ -98,7 +98,7 @@ Quy ước hình dạng use case, activity partitions/decision nodes, state tran
 
 ## Ranh giới và điểm cần lưu ý cho kiểm thử
 
-- Không thấy frontend server-side rendering; source vào ứng dụng qua `frontend/src/main.jsx` và `BrowserRouter`.
+- Không thấy frontend server-side rendering; source vào ứng dụng qua `src/main.jsx` và `BrowserRouter`.
 - Không có service gọi cổng thanh toán trong dependencies hoặc backend source. BANKING hiện tạo hướng dẫn/nội dung chuyển khoản và chờ admin xác nhận; comment nhắc Univer Dashboard Sheet nhưng không có connector sheet trong code.
 - Kiểm tra role ở giao diện (`AppRoutes.jsx`) giúp điều hướng, còn quyền API được enforce ở backend `SecurityConfig`.
 - Tài liệu `frontend/UI_SPEC.md` mô tả một số luồng cũ: chưa nêu API hồ sơ, reviews, wishlist, trạng thái giao hàng đầy đủ và API thống kê, trong khi các phần này có trong source hiện tại. Khi có sai khác, tài liệu này ưu tiên source và ghi nhận lệch ở mục thông tin chưa xác định.
