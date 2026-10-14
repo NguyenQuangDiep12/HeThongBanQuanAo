@@ -49,12 +49,12 @@ class ProductCatalogSeederTests {
                         .isEqualTo(50));
 
         Product firstItem = products.findByStatus(ProductStatus.ACTIVE).stream()
-                .filter(product -> product.getName().equals("Áo thun basic mẫu 01"))
+                .filter(product -> product.getName().equals("Áo thun basic 01"))
                 .findFirst()
                 .orElseThrow();
         assertThat(firstItem.getPrice()).isEqualByComparingTo(new BigDecimal("99000"));
         assertThat(firstItem.getImageUrl()).startsWith("https://images.unsplash.com/");
-        assertThat(firstItem.getDescription()).contains("GIẢ LẬP");
+        assertThat(firstItem.getDescription()).contains("Dữ liệu mô phỏng", "chưa xác minh");
         assertThat(firstItem.getVariants()).singleElement().satisfies(variant -> {
             assertThat(variant.getSize()).isEqualTo("S");
             assertThat(variant.getColor()).isEqualTo("Đen");
