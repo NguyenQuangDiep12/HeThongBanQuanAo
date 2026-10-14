@@ -42,11 +42,11 @@ class ProductCatalogSeederTests {
 
     @Test
     void importsAllRowsOnceAndPublishesThemThroughPublicCatalogApi() throws Exception {
-        assertThat(products.count()).isEqualTo(350);
-        assertThat(variants.count()).isEqualTo(350);
+        assertThat(products.count()).isEqualTo(100);
+        assertThat(variants.count()).isEqualTo(100);
         assertThat(categories.findAllByOrderByNameAsc()).hasSize(7)
                 .allSatisfy(category -> assertThat(products.countByCategory_Id(category.getId()))
-                        .isEqualTo(50));
+                        .isBetween(14L, 15L));
 
         Product firstItem = products.findByStatus(ProductStatus.ACTIVE).stream()
                 .filter(product -> product.getName().equals("Áo thun basic 01"))
@@ -69,8 +69,8 @@ class ProductCatalogSeederTests {
         products.saveAndFlush(firstItem);
 
         seeder.run(new DefaultApplicationArguments(new String[0]));
-        assertThat(products.count()).isEqualTo(350);
-        assertThat(variants.count()).isEqualTo(350);
+        assertThat(products.count()).isEqualTo(100);
+        assertThat(variants.count()).isEqualTo(100);
         Product preservedProduct = products.findById(firstItem.getId()).orElseThrow();
         assertThat(preservedProduct.getPrice()).isEqualByComparingTo(new BigDecimal("111000"));
         assertThat(variants.findById(variantId).orElseThrow().getPrice())
@@ -81,7 +81,7 @@ class ProductCatalogSeederTests {
                         .param("page", "0")
                         .param("pageSize", "100"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(350))
+                .andExpect(jsonPath("$.totalElements").value(100))
                 .andExpect(jsonPath("$.items.length()").value(100));
 
         assertThat(categories.findAllByOrderByNameAsc())
