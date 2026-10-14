@@ -1,0 +1,34 @@
+@startuml
+left to right direction
+skinparam componentStyle uml2
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Frontend (React / Vite)" {
+  component "React pages and features" as UI
+  component "services/*" as Services
+  component "api.js\nHTTP / JSON / session token" as ApiClient
+  UI ..> Services : invokes
+  Services ..> ApiClient : invokes
+}
+
+package "Backend (Spring Boot)" {
+  component "JWT filter and\nSecurityConfig" as Security
+  component "REST controllers" as Controllers
+  component "Business services" as Domain
+  component "Spring Data JPA\nrepositories" as Repositories
+  component "JPA entities" as Entities
+  component "PaymentTransactionService" as Payments
+
+  Security ..> Controllers : authenticated request
+  Controllers ..> Domain : delegates
+  Domain ..> Repositories : queries / saves
+  Domain ..> Payments : BANKING checkout
+  Payments ..> Repositories : payment / order data
+  Repositories ..> Entities : maps
+}
+
+component "MySQL-compatible\nrelational database" as DB <<database>>
+ApiClient ..> Security : HTTP /api, JSON
+Repositories ..> DB : JPA / JDBC
+@enduml

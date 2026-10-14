@@ -1,0 +1,47 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+actor Guest
+actor Customer
+actor Administrator as Admin
+
+rectangle "BLUE THREAD / Shopee" {
+  usecase "Browse catalog" as UC_Catalog
+  usecase "Register / log in" as UC_Auth
+  usecase "Manage cart" as UC_Cart
+  usecase "Checkout" as UC_Checkout
+  usecase "View own orders" as UC_MyOrders
+  usecase "Cancel pending order" as UC_Cancel
+  usecase "Confirm receipt" as UC_Receipt
+  usecase "Manage wishlist" as UC_Wishlist
+  usecase "Submit product review" as UC_Review
+  usecase "Read notifications" as UC_Notifications
+  usecase "Manage products and variants" as UC_Products
+  usecase "Manage categories" as UC_Categories
+  usecase "Manage order delivery status" as UC_OrderAdmin
+  usecase "Confirm bank transfer" as UC_Payment
+  usecase "Activate / deactivate users" as UC_Users
+  usecase "View statistics" as UC_Statistics
+  usecase "Manage bank accounts" as UC_Banks
+}
+
+Guest -- UC_Catalog
+Guest -- UC_Auth
+Customer -- UC_Catalog
+Customer -- UC_Cart
+Customer -- UC_Checkout
+Customer -- UC_MyOrders
+Customer -- UC_Cancel
+Customer -- UC_Receipt
+Customer -- UC_Wishlist
+Customer -- UC_Review
+Customer -- UC_Notifications
+Admin -- UC_Products
+Admin -- UC_Categories
+Admin -- UC_OrderAdmin
+Admin -- UC_Payment
+Admin -- UC_Users
+Admin -- UC_Statistics
+Admin -- UC_Banks
+@enduml
