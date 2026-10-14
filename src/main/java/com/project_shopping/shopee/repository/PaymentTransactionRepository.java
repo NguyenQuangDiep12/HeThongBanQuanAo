@@ -12,9 +12,7 @@ import java.util.Optional;
 
 public interface PaymentTransactionRepository extends JpaRepository<PaymentTransaction, Long> {
     List<PaymentTransaction> findAllByOrderByCreatedAtDesc();
-    Optional<PaymentTransaction> findByOrderId(Long orderId);
     Optional<PaymentTransaction> findFirstByOrderIdOrderByCreatedAtDesc(Long orderId);
-    Optional<PaymentTransaction> findByTransferMemo(String transferMemo);
 
     @Query("SELECT tx.order.id FROM PaymentTransaction tx WHERE tx.id = :id")
     Optional<Long> findOrderIdById(@Param("id") Long id);

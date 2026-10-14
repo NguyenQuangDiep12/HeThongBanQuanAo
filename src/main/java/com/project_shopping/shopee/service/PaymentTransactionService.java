@@ -3,11 +3,13 @@ package com.project_shopping.shopee.service;
 import com.project_shopping.shopee.dto.BankDtos.PaymentTransactionResponse;
 import com.project_shopping.shopee.model.BankAccount;
 import com.project_shopping.shopee.model.CustomerOrder;
+import com.project_shopping.shopee.model.Notification;
 import com.project_shopping.shopee.model.PaymentTransaction;
 import com.project_shopping.shopee.model.PaymentTransaction.TransactionStatus;
 import com.project_shopping.shopee.model.enums.OrderStatus;
 import com.project_shopping.shopee.model.enums.PaymentStatus;
 import com.project_shopping.shopee.repository.BankAccountRepository;
+import com.project_shopping.shopee.repository.NotificationRepository;
 import com.project_shopping.shopee.repository.OrderRepository;
 import com.project_shopping.shopee.repository.PaymentTransactionRepository;
 import com.project_shopping.shopee.util.PaymentMemoUtil;
@@ -25,13 +27,16 @@ public class PaymentTransactionService {
     private final PaymentTransactionRepository transactionRepository;
     private final BankAccountRepository bankAccountRepository;
     private final OrderRepository orderRepository;
+    private final NotificationRepository notificationRepository;
 
     public PaymentTransactionService(PaymentTransactionRepository transactionRepository,
                                      BankAccountRepository bankAccountRepository,
-                                     OrderRepository orderRepository) {
+                                     OrderRepository orderRepository,
+                                     NotificationRepository notificationRepository) {
         this.transactionRepository = transactionRepository;
         this.bankAccountRepository = bankAccountRepository;
         this.orderRepository = orderRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     /**
@@ -48,6 +53,9 @@ public class PaymentTransactionService {
                     : order.getItems().get(0).getVariant().getProduct().getName());
 
         String cleanName = PaymentMemoUtil.stripAccents(rawProductName);
+        if (cleanName.isBlank()) {
+            cleanName = "AO";
+        }
         if (cleanName.length() > 12) {
             cleanName = cleanName.substring(0, 12);
         }
@@ -106,6 +114,12 @@ public class PaymentTransactionService {
 
         order = orderRepository.findDetailedById(orderId).orElse(order);
         Instant confirmedAt = Instant.now();
+        if (order.getCreatedAt() != null && confirmedAt.isBefore(order.getCreatedAt())) {
+            confirmedAt = order.getCreatedAt();
+        }
+        if (tx.getCreatedAt() != null && confirmedAt.isBefore(tx.getCreatedAt())) {
+            confirmedAt = tx.getCreatedAt();
+        }
         tx.setStatus(TransactionStatus.CONFIRMED);
         tx.setConfirmedAt(confirmedAt);
 
@@ -116,6 +130,8 @@ public class PaymentTransactionService {
             order.getPayment().setPaymentStatus(PaymentStatus.PAID);
             order.getPayment().setPaidAt(confirmedAt);
         }
+        notificationRepository.save(new Notification(order.getUser(), order,
+                "Đơn hàng đã được xác nhận", "Đơn hàng #" + order.getId() + " đã được xác nhận."));
 
         orderRepository.save(order);
         PaymentTransaction updated = transactionRepository.save(tx);

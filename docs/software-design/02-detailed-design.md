@@ -63,7 +63,7 @@ Phụ thuộc cần giả lập cho unit: `UserRepository`, `JwtService`, reques
 ### ProductService
 
 - `categories(): List<String>` trả tên category có product ACTIVE theo query repository.
-- `search(keyword, category, size, color, minPrice, maxPrice, inStock, page, pageSize, sortKey): ProductPageResponse` kiểm `page` 0–10,000, `pageSize` 1–100; min/max không âm và min ≤ max; chấp nhận sort `newest`, `price_asc`, `price_desc`, `name_asc`, `name_desc` (không phân biệt hoa/thường cho sort); còn lại 400. Dựng `ProductSpecifications.catalog`, gọi `findAll(spec, PageRequest)` và map page. Keyword/category/size/color được chuyển cho Specification; filter giá so với `Product.price`; filter size/color/tồn tìm trên biến thể.
+- `search(keyword, category, size, color, minPrice, maxPrice, inStock, page, pageSize, sortKey): ProductPageResponse` kiểm `page` 0–10,000, `pageSize` 1–100; min/max không âm và min ≤ max; chấp nhận sort `newest`, `price_asc`, `price_desc`, `name_asc`, `name_desc` (không phân biệt hoa/thường cho sort); còn lại 400. Mỗi sort dùng `id DESC` làm tie-breaker để thứ tự trang ổn định. Dựng `ProductSpecifications.catalog`, gọi `findAll(spec, PageRequest)` và map page. Query trang nạp sẵn category; `hibernate.default_batch_fetch_size=50` gom tải collection variants theo lô.
 - `filterOptions(): ProductFilterOptions` ghép categories, sizes, colors, min/max giá từ các query riêng; size/color và price range chỉ xét biến thể còn hàng, category active, product ACTIVE theo query.
 - `related(Long id, int limit): List<ProductResponse>` chỉ bắt đầu từ product ACTIVE thuộc category ACTIVE; limit 1–20; lấy product ACTIVE khác cùng category, mới nhất trước, cắt limit. Không yêu cầu product liên quan còn tồn.
 - `getActive(Long id): ProductResponse` chỉ trả product ACTIVE có category ACTIVE; nếu không tìm thấy → 404.
@@ -73,14 +73,14 @@ Phụ thuộc cần giả lập cho unit: `UserRepository`, `JwtService`, reques
 - `deactivate(Long): void` set INACTIVE; không xóa record.
 - `addVariant(productId, VariantRequest): VariantResponse` cần product tồn tại, trim size/color, tạo variant; database unique `(product_id,size,color)` bảo vệ trùng.
 - `updateVariant(productId, variantId, request): VariantResponse` khóa variant; không có hoặc không thuộc product id → 404; trim size/color và cập nhật tồn/giá.
-- `deleteVariant(productId, variantId): void` kiểm tồn tại và đúng product; delete+flush; RuntimeException được đổi thành 409. Nhánh conflict có thể do khóa ngoại giỏ/order.
+- `deleteVariant(productId, variantId): void` kiểm tồn tại và đúng product; delete+flush; chỉ `DataIntegrityViolationException` được đổi thành 409 do ràng buộc dữ liệu. Lỗi khác tiếp tục được xử lý như lỗi hệ thống.
 - `toResponse`/`toVariant` map entity sang DTO; product response bao gồm variants và category.
 
 Phụ thuộc: ProductRepository (Specification, entity graph, filter options), VariantRepository (lock/unique lookup), CategoryService (yêu cầu category ACTIVE). Giá `Product.price` dùng filter/catalog; giá `ProductVariant.price` dùng giỏ/checkout. Không thấy validator bắt hai giá bằng nhau.
 
 ### ProductSpecifications
 
-`catalog(...): Specification<Product>` luôn thêm điều kiện Product ACTIVE và Category ACTIVE, rồi nối điều kiện keyword/category/price/variant bằng AND. Keyword rỗng bỏ qua; keyword so LIKE trên tên, mô tả và tên category sau lower-case, ký tự `%`/`_` được escape. Category/size/color trim và so không phân biệt hoa thường. Giá lọc đóng hai biên trên `Product.price`.
+`catalog(...): Specification<Product>` luôn thêm điều kiện Product ACTIVE và Category ACTIVE, rồi nối điều kiện keyword/category/price/variant bằng AND. Keyword rỗng bỏ qua; keyword so LIKE trên tên, mô tả và tên category sau lower-case, ký tự `\\`, `%` và `_` được escape theo thứ tự. Chuẩn hóa hoa/thường dùng `Locale.ROOT`. Category/size/color trim và so không phân biệt hoa thường. Giá lọc đóng hai biên trên `Product.price`.
 
 Variant conditions cùng match một biến thể trong EXISTS query. `inStock=true` yêu cầu stock > 0; `inStock=false` cùng size/color yêu cầu variant khớp có stock = 0; chỉ `inStock=false` yêu cầu không tồn tại variant stock dương (bao gồm product không có variant). Đây là hành vi suy ra trực tiếp từ predicate.
 
@@ -94,7 +94,7 @@ Variant conditions cùng match một biến thể trong EXISTS query. `inStock=t
 
 ### Validation request liên quan
 
-`ProductRequest`: name not blank ≤180, categoryId >0, price ≥0.01, imageUrl ≤1000; description không có giới hạn DTO; status nullable. `VariantRequest`: size not blank ≤40, color not blank ≤60, stock ≥0, price ≥0.01. `CategoryRequest`: name not blank ≤80, description ≤500, active nullable.
+`ProductRequest`: name not blank ≤180, categoryId >0, price ≥0.01, tối đa 10 chữ số nguyên/2 chữ số thập phân, giá phải là số nguyên VND; `199000.00` được chấp nhận nhưng `199000.50` bị từ chối. `imageUrl` ≤1000; description không có giới hạn DTO; status nullable. `VariantRequest`: size not blank ≤40, color not blank ≤60, stock ≥0; giá có cùng precision và ràng buộc số nguyên VND. `CategoryRequest`: name not blank ≤80, description ≤500, active nullable. `@WholeVndAmount` chỉ bác phần giá trị lẻ thực sự sau khi bỏ các số 0 cuối, phù hợp với checkout BANKING chuyển tổng tiền sang số nguyên chính xác.
 
 **Nguồn:** `service/ProductService.java`, `repository/ProductSpecifications.java`, `repository/ProductRepository.java`, `service/CategoryService.java`, `dto/ApiDtos.java`.
 
@@ -111,20 +111,20 @@ Phụ thuộc: `UserRepository`, `CartRepository` và `VariantRepository`; lock 
 
 ### OrderService
 
-- `checkout(email, CheckoutRequest): OrderResponse`: yêu cầu user; cart thiếu/rỗng → 400. Sắp các variant theo id, khóa từng variant; kiểm variant tồn tại, product ACTIVE và quantity không vượt stock. Tính total từ giá biến thể đang khóa; địa chỉ/phone trim; tạo order mặc định PENDING; tạo OrderItem snapshot tên/size/color và unit price; trừ tồn; tạo Payment; nếu BANKING tạo PaymentTransaction; xóa cart lines, cập nhật thời gian. `@Transactional` gom các ghi; lỗi giữa chừng phải rollback theo transaction manager.
+- `checkout(email, CheckoutRequest): OrderResponse`: yêu cầu user; cart thiếu/rỗng → 400. Sắp các variant theo id, khóa từng variant; kiểm variant tồn tại, product ACTIVE và quantity không vượt stock. Tính total từ giá biến thể đang khóa; total phải dương và không vượt `999999999999.99`, giới hạn `DECIMAL(14,2)` dùng cho order/subtotal/payment; địa chỉ/phone trim; tạo order mặc định PENDING; tạo OrderItem snapshot tên/size/color và unit price; trừ tồn; tạo Payment; nếu BANKING tạo PaymentTransaction; xóa cart lines, cập nhật thời gian. `@Transactional` gom các ghi; lỗi giữa chừng phải rollback theo transaction manager.
 - `myOrders(email)` trả đơn của user mới nhất trước; `myOrder(email,id)` query cả id và user id, không có/không thuộc user → 404.
 - `allOrders()` / `adminOrder(id)` phục vụ admin; detail thiếu → 404.
 - `confirm(id)` chỉ PENDING → CONFIRMED, ghi `confirmedAt`, tạo notification; status khác → 409.
 - `startDelivery(id)` chỉ CONFIRMED → SHIPPING, ghi `shippingAt`, tạo notification; sai status → 409.
 - `markDelivered(id)` chỉ SHIPPING → DELIVERED, ghi `deliveredAt`, tạo notification; sai status → 409.
 - `confirmReceipt(email,id)` yêu cầu order owner và DELIVERED; chuyển COMPLETED, ghi `customerConfirmedAt`, tạo notification; order không thuộc user → 404, status sai → 409.
-- `cancel(id)` là admin hủy; `cancelByCustomer(email,id)` còn kiểm owner; cả hai chỉ cho PENDING. `cancelPendingOrder` hoàn tồn, chuyển CANCELLED, ghi `cancelledAt`, tạo notification.
+- `cancel(id)` là admin hủy; `cancelByCustomer(email,id)` còn kiểm owner; cả hai chỉ cho PENDING. `cancelPendingOrder` khóa và chuyển các payment transaction PENDING sang REJECTED, hoàn tồn, chuyển order CANCELLED, ghi `cancelledAt`, tạo notification; riêng payment BANKING chuyển PENDING sang FAILED.
 - `restoreInventory(order)` khóa variant theo id tăng dần; variant mất → 409; cộng quantity bằng `Math.addExact` (overflow ném ArithmeticException); tổng hợp lệ thì tồn tăng.
-- `timestampAfter(previous)` dùng `Instant.now()`; nếu now sớm hơn timestamp trước → 409, bằng nhau được chấp nhận.
+- `timestampAfter(previous)` trả `max(Instant.now(), previous)` nếu previous có giá trị; khi đồng hồ của instance hiện tại chậm hơn, timestamp bằng mốc trước thay vì từ chối chuyển trạng thái.
 - `lockOrder(id)` lock rồi query detail graph; thiếu → 404. `requireOwner`, `requireStatus` là guard private.
 - `toResponse(order)` map snapshots; nếu snapshot null dùng giá trị product/variant hiện tại. Với payment BANKING, tìm memo theo order id; không có transaction thì memo null.
 
-State flow được implement chính thức: PENDING → CONFIRMED → SHIPPING → DELIVERED → COMPLETED, hoặc PENDING → CANCELLED. Payment transaction confirmation là đường khác: service xác nhận giao dịch tự đặt order thành CONFIRMED mà không gọi guard trạng thái của OrderService.
+State flow được implement chính thức: PENDING → CONFIRMED → SHIPPING → DELIVERED → COMPLETED, hoặc PENDING → CANCELLED. Hai đường xác nhận (OrderService và xác nhận chuyển khoản) đều yêu cầu order PENDING; đường BANKING còn yêu cầu transaction PENDING và Payment có phương thức BANKING.
 
 **Nguồn:** `service/CartService.java`, `service/OrderService.java`, `model/OrderItem.java`, `repository/CartRepository.java`, `repository/VariantRepository.java`, `repository/OrderRepository.java`.
 
@@ -132,19 +132,19 @@ State flow được implement chính thức: PENDING → CONFIRMED → SHIPPING 
 
 ### PaymentTransactionService
 
-- `createTransactionForOrder(CustomerOrder): PaymentTransaction`: lấy tên item đầu hoặc fallback “AO”; ưu tiên product name snapshot; bỏ dấu/ký tự không chữ-số, uppercase; cắt 12 ký tự; nếu có nhiều item thêm `PLUS`; tạo code ngẫu nhiên 4 ký tự; amount dùng `totalAmount.longValue()` trong memo; memo theo mẫu `CLEANNAME CODE AMOUNT`; lấy tài khoản active mới nhất, nếu không có dùng `N/A`; order code `BT-` + id zero-padded 5; lưu transaction PENDING.
-- `confirmPaymentByAdmin(Long): PaymentTransactionResponse`: transaction thiếu → 404; CONFIRMED sẵn → 400; các status khác hiện được set CONFIRMED; set transaction timestamp; lấy order, set order status CONFIRMED và timestamp mới; nếu payment tồn tại set PAID/paidAt; lưu order và transaction. Không kiểm order đang PENDING, không đổi notification trong method này.
+- `createTransactionForOrder(CustomerOrder): PaymentTransaction`: lấy tên item đầu hoặc fallback “AO”; ưu tiên product name snapshot; bỏ dấu/ký tự không chữ-số, uppercase theo `Locale.ROOT`; nếu kết quả rỗng dùng “AO”; cắt 12 ký tự; nếu có nhiều item thêm `PLUS`; tạo code SecureRandom 8 ký tự; yêu cầu tổng tiền chuyển khoản là số nguyên VND (nếu có phần lẻ → 400); memo chứa order code, tên rút gọn, code và amount; yêu cầu có bank active mới nhất (không có → 409); lưu transaction PENDING.
+- `confirmPaymentByAdmin(Long): PaymentTransactionResponse`: truy vấn order id, khóa order trước rồi khóa transaction; thiếu transaction/order → 404; transaction không PENDING, order không PENDING hoặc payment không phải BANKING → 409. Khi hợp lệ, đặt transaction CONFIRMED, order CONFIRMED và payment PAID; cùng một mốc thời gian không sớm hơn `createdAt` của order/transaction; tạo notification; lưu thay đổi trong transaction.
 - `getAllTransactionsForUniver(): List<PaymentTransactionResponse>` trả toàn bộ mới nhất trước.
 - `toResponse` map các trường dashboard.
 
 ### PaymentMemoUtil
 
-- `stripAccents(String): String`: null/blank → chuỗi rỗng; NFD normalize, bỏ combining marks, đ/Đ thành d/D, bỏ ký tự ngoài ASCII chữ/số, uppercase.
-- `generateRandomCode(int): String`: sinh đúng số ký tự từ alphabet không chứa I/O/0/1 (`ABCDEFGHJKLMNPQRSTUVWXYZ23456789`) bằng `java.util.Random`; source không kiểm length dương và không cam kết uniqueness.
+- `stripAccents(String): String`: null/blank → chuỗi rỗng; NFD normalize, bỏ combining marks, đ/Đ thành d/D, bỏ ký tự ngoài ASCII chữ/số, uppercase theo `Locale.ROOT`. Tên chỉ có ký tự ngoài Latin cho kết quả rỗng; service dùng “AO” làm fallback.
+- `generateRandomCode(int): String`: sinh đúng số ký tự từ alphabet không chứa I/O/0/1 (`ABCDEFGHJKLMNPQRSTUVWXYZ23456789`) bằng `SecureRandom`; service gọi với độ dài 8. Hàm tiện ích không kiểm tra length dương và không bảo đảm không trùng.
 
 ### Bank APIs và initializer
 
-`AdminBankController.saveBankAccount` trim/uppercase bankCode, trim name/number, uppercase accountName, tắt active trên object của các row tìm được và lưu row mới; `BankAccount` constructor mặc định row mới active. Controller không có `@Transactional` và không gọi `save` cho rows cũ; tính bền của thay đổi active trên row cũ cần integration test. Query public/admin lấy active account có id lớn nhất. `BankDataInitializer` tạo row demo khi bảng rỗng.
+`AdminBankController.saveBankAccount` gọi `BankAccountService.saveActiveAccount`; service mở transaction, khóa các dòng tài khoản hiện có, tắt active trên các dòng đó và lưu tài khoản mới đang active. Chuẩn hóa bankCode/accountName dùng `Locale.ROOT`. DTO chặn độ dài vượt cột (20/100/50/120/20). Query lấy active account có id lớn nhất. Mapping entity không có unique constraint bảo đảm chỉ một active row; tính cạnh tranh lúc bảng trống phụ thuộc lock/isolation của database và cần kiểm tra MySQL thật. `BankDataInitializer` tạo row demo khi bảng rỗng trong cấu hình dev.
 
 **Chưa xác định:** Univer không xuất hiện dưới dạng integration/API client trong source/dependencies; việc đồng bộ sheet ngoài ứng dụng chưa được mô tả.
 
@@ -176,7 +176,7 @@ State flow được implement chính thức: PENDING → CONFIRMED → SHIPPING 
 ### AdminUserService
 
 - `list()` map user theo thời gian tạo giảm dần.
-- `setActive(id, active, adminEmail)` thiếu id → 404; không phải role USER → 403; admin tự khóa email của mình → 400; còn lại set active và trả DTO. Chỉ đổi USER; filter JWT chặn user inactive ở request kế tiếp.
+- `setActive(id, active)` thiếu id → 404; target không phải role USER → 403; còn lại set active và trả DTO. Chỉ đổi USER; filter JWT chặn user inactive ở request kế tiếp. Controller không truyền principal vì service chỉ thao tác với tài khoản USER mục tiêu.
 
 ### AdminStatisticsService
 
@@ -224,9 +224,9 @@ PlantUML source: [`activity-checkout.puml`](diagrams/activity-checkout.puml).
 
 ![State Machine Diagram cho OrderStatus và ghi chú status thanh toán](diagrams/state-order-payment.png)
 
-Các state `PENDING`, `CONFIRMED`, `SHIPPING`, `DELIVERED`, `COMPLETED`, `CANCELLED` khớp enum `OrderStatus`. Luồng có guard ở `OrderService`: hủy chỉ nhận `PENDING`, các chuyển tiếp giao hàng cần trạng thái trước tương ứng, và xác nhận nhận hàng kiểm tra chủ đơn. Ghi chú riêng nêu đường xác nhận BANKING đặt order thành `CONFIRMED` mà không kiểm tra trạng thái trước; đây là hành vi hiện tại của `PaymentTransactionService.confirmPaymentByAdmin`, không phải luật suy diễn của sơ đồ chuẩn.
+Các state `PENDING`, `CONFIRMED`, `SHIPPING`, `DELIVERED`, `COMPLETED`, `CANCELLED` khớp enum `OrderStatus`. `OrderService` guard theo trạng thái trước; hủy chỉ nhận `PENDING`, các chuyển tiếp giao hàng cần trạng thái tương ứng và xác nhận nhận hàng kiểm tra chủ đơn. Đường xác nhận BANKING cũng kiểm tra order PENDING, transaction PENDING và payment BANKING trước khi xác nhận.
 
-Sơ đồ chính mô tả lifecycle order. `PaymentStatus` và `PaymentTransaction.TransactionStatus` chỉ được ghi chú riêng vì chúng có enum trạng thái riêng; source hiện quan sát thấy các cập nhật `PENDING`/`PAID` và `PENDING`/`CONFIRMED`, không thấy mã đặt `FAILED`/`REJECTED`.
+Sơ đồ chính mô tả lifecycle order. `PaymentStatus` và `PaymentTransaction.TransactionStatus` có enum riêng; khi hủy, payment BANKING chuyển `PENDING → FAILED`, transaction `PENDING → REJECTED`; khi admin xác nhận chuyển khoản hợp lệ, transaction thành `CONFIRMED` và payment thành `PAID`.
 
 **Nguồn:** `model/enums/OrderStatus.java`; `model/enums/PaymentStatus.java`; `model/PaymentTransaction.java`; `service/OrderService.java:41,113-206`; `service/PaymentTransactionService.java:76-105`.
 

@@ -11,6 +11,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -68,7 +69,7 @@ public class ApiExceptionHandler {
         String message = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(error -> validationMessage(error.getField(), error.getDefaultMessage()))
+                .map(this::validationMessage)
                 .findFirst()
                 .orElse("Dữ liệu gửi lên chưa hợp lệ. Vui lòng kiểm tra lại.");
 
@@ -171,17 +172,41 @@ public class ApiExceptionHandler {
                 .body(errorResponse);
     }
 
-    private String validationMessage(String field, String defaultMessage) {
-        String label = fieldLabel(field);
-        String constraint = switch (defaultMessage == null ? "" : defaultMessage) {
-            case "must not be blank", "must not be null" -> "không được để trống";
-            case "must be greater than 0" -> "phải lớn hơn 0";
-            case "must be greater than or equal to 0" -> "phải bằng hoặc lớn hơn 0";
-            case "must be greater than or equal to 0.01" -> "phải lớn hơn 0";
-            case "must be a well-formed email address" -> "không đúng định dạng email";
-            default -> translateSizeMessage(defaultMessage);
+    private String validationMessage(FieldError error) {
+        String label = fieldLabel(error.getField());
+        String constraint = switch (error.getCode() == null ? "" : error.getCode()) {
+            case "NotBlank", "NotNull" -> "không được để trống";
+            case "Positive" -> "phải lớn hơn 0";
+            case "PositiveOrZero" -> "phải bằng hoặc lớn hơn 0";
+            case "DecimalMin" -> "phải đạt giá trị tối thiểu cho phép";
+            case "DecimalMax", "Max" -> "vượt quá giá trị tối đa cho phép";
+            case "Email" -> "không đúng định dạng email";
+            case "WholeVndAmount" -> "phải là số nguyên VND";
+            case "Size" -> sizeConstraint(error.getArguments());
+            case "Digits" -> "không đúng số chữ số cho phép";
+            default -> "chưa hợp lệ";
         };
         return label + " " + constraint + ".";
+    }
+
+    private String sizeConstraint(Object[] arguments) {
+        if (arguments == null || arguments.length < 3
+                || !(arguments[1] instanceof Number maxValue)
+                || !(arguments[2] instanceof Number minValue)) {
+            return "có độ dài không hợp lệ";
+        }
+        int min = minValue.intValue();
+        int max = maxValue.intValue();
+        if (min > 0 && max < Integer.MAX_VALUE) {
+            return "phải có từ " + min + " đến " + max + " ký tự";
+        }
+        if (min > 0) {
+            return "phải có ít nhất " + min + " ký tự";
+        }
+        if (max < Integer.MAX_VALUE) {
+            return "không được vượt quá " + max + " ký tự";
+        }
+        return "có độ dài không hợp lệ";
     }
 
     private String fieldLabel(String field) {
@@ -201,7 +226,12 @@ public class ApiExceptionHandler {
                 Map.entry("variantId", "phân loại sản phẩm"),
                 Map.entry("shippingAddress", "địa chỉ giao hàng"),
                 Map.entry("paymentMethod", "phương thức thanh toán"),
-                Map.entry("description", "mô tả")
+                Map.entry("description", "mô tả"),
+                Map.entry("bankCode", "mã ngân hàng"),
+                Map.entry("bankName", "tên ngân hàng"),
+                Map.entry("accountNo", "số tài khoản"),
+                Map.entry("accountName", "tên chủ tài khoản"),
+                Map.entry("qrTemplate", "mẫu QR")
         );
         Map<String, String> parameterNames = Map.of(
                 "page", "số trang",
@@ -217,13 +247,6 @@ public class ApiExceptionHandler {
                 field,
                 parameterNames.getOrDefault(field, "trường " + field)
         );
-    }
-
-    private String translateSizeMessage(String defaultMessage) {
-        if (defaultMessage != null && defaultMessage.startsWith("size must be between ")) {
-            return "vượt quá độ dài cho phép";
-        }
-        return "chưa hợp lệ";
     }
 
     public static String localizedStatus(HttpStatus status) {

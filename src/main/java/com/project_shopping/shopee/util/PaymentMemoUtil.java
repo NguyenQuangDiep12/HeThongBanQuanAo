@@ -2,6 +2,7 @@ package com.project_shopping.shopee.util;
 
 import java.text.Normalizer;
 import java.security.SecureRandom;
+import java.util.Locale;
 
 public final class PaymentMemoUtil {
 
@@ -21,7 +22,7 @@ public final class PaymentMemoUtil {
                 .replace("đ", "d")
                 .replace("Đ", "D")
                 .replaceAll("[^a-zA-Z0-9]", "")
-                .toUpperCase();
+                .toUpperCase(Locale.ROOT);
     }
 
     /**

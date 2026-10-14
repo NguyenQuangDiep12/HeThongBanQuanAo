@@ -7,6 +7,7 @@ import com.project_shopping.shopee.repository.ProductRepository;
 import com.project_shopping.shopee.repository.ProductSpecifications;
 import com.project_shopping.shopee.repository.VariantRepository;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -93,31 +94,31 @@ public class ProductService {
                     Sort.by(
                             Sort.Direction.DESC,
                             "createdAt"
-                    );
+                    ).and(Sort.by(Sort.Direction.DESC, "id"));
 
             case "price_asc" ->
                     Sort.by(
                             Sort.Direction.ASC,
                             "price"
-                    );
+                    ).and(Sort.by(Sort.Direction.DESC, "id"));
 
             case "price_desc" ->
                     Sort.by(
                             Sort.Direction.DESC,
                             "price"
-                    );
+                    ).and(Sort.by(Sort.Direction.DESC, "id"));
 
             case "name_asc" ->
                     Sort.by(
                             Sort.Direction.ASC,
                             "name"
-                    );
+                    ).and(Sort.by(Sort.Direction.DESC, "id"));
 
             case "name_desc" ->
                     Sort.by(
                             Sort.Direction.DESC,
                             "name"
-                    );
+                    ).and(Sort.by(Sort.Direction.DESC, "id"));
 
             default ->
                     throw new ResponseStatusException(
@@ -436,7 +437,7 @@ public class ProductService {
         try {
             variants.delete(variant);
             variants.flush();
-        } catch (RuntimeException ex) {
+        } catch (DataIntegrityViolationException ex) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Phân loại sản phẩm đang được sử dụng trong giỏ hàng hoặc đơn hàng nên không thể xóa. Hãy đặt số lượng tồn kho về 0.",

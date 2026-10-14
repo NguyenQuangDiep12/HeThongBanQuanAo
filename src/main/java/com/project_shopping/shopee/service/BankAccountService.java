@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class BankAccountService {
@@ -20,13 +21,13 @@ public class BankAccountService {
 
     @Transactional
     public BankAccountResponse saveActiveAccount(BankAccountRequest request) {
-        bankAccounts.findAll().forEach(account -> account.setActive(false));
+        bankAccounts.findAllForUpdate().forEach(account -> account.setActive(false));
 
         BankAccount account = new BankAccount(
-                request.bankCode().trim().toUpperCase(),
+                request.bankCode().trim().toUpperCase(Locale.ROOT),
                 request.bankName().trim(),
                 request.accountNo().trim(),
-                request.accountName().trim().toUpperCase(),
+                request.accountName().trim().toUpperCase(Locale.ROOT),
                 request.qrTemplate()
         );
         return toResponse(bankAccounts.save(account));

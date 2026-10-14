@@ -10,14 +10,14 @@ COMPLETED --> [*]
 CANCELLED --> [*]
 
 note right of CONFIRMED
-  Separate BANKING confirmation path:
-  PaymentTransactionService.confirmPaymentByAdmin
-  sets the order to CONFIRMED without checking
-  the order's prior status.
+  BANKING confirmation requires a PENDING
+  transaction, PENDING order, and BANKING
+  payment. It sets the order to CONFIRMED.
 end note
 
 note bottom of CANCELLED
-  Cancellation methods accept PENDING only
-  and restore inventory.
+  Cancellation accepts PENDING only and restores
+  inventory. Pending BANKING payment becomes FAILED;
+  pending transactions become REJECTED.
 end note
 @enduml

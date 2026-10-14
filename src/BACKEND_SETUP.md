@@ -17,7 +17,7 @@ $env:ADMIN_PASSWORD = '<a unique password of at least 8 characters>'
 .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-This starts only Spring Boot. Local database defaults come from `application-dev.properties`; `DB_PASSWORD`, `JWT_SECRET`, and `ADMIN_PASSWORD` must be supplied. Start MySQL and ensure the configured `clotherwebsite` database exists. The API fails to start if `JWT_SECRET` is missing or shorter than 32 bytes. Outside `dev`/`test`, the production guard requires a non-root database account, a password, a JWT secret of at least 32 bytes, bootstrap admin credentials, and a `DB_URL` query parameter `sslMode=VERIFY_IDENTITY` backed by a trusted certificate. Configure these before deployment; do not activate the `dev` profile against production data.
+This starts only Spring Boot. Local database defaults come from `application-dev.properties`; `DB_PASSWORD`, `JWT_SECRET`, and `ADMIN_PASSWORD` must be supplied. Start MySQL and ensure the configured `clotherwebsite` database exists. The API fails to start if `JWT_SECRET` is missing or shorter than 32 bytes. Outside `dev`/`test`, an early `EnvironmentPostProcessor` validates a non-root database account, password, a JWT secret of at least 32 bytes, and a `DB_URL` query parameter `sslMode=VERIFY_IDENTITY` backed by a trusted certificate. `ADMIN_EMAIL` and `ADMIN_PASSWORD` are optional one-time bootstrap credentials and must be provided together when used. Configure these before deployment; do not activate the `dev` profile against production data.
 
 At startup, `AdminBootstrap` creates the initial admin when that email does not already exist. In `dev`, the email defaults to `admin@local`; `ADMIN_PASSWORD` must be supplied. An existing admin's active state is preserved on restart.
 
@@ -97,4 +97,4 @@ Checkout locks cart and variant rows and writes the order, order lines, payment 
 
 ## Test coverage
 
-The current automated test suite contains a Spring context-load test using an ephemeral H2 database and the `test` profile. It does not yet cover checkout concurrency, authorization scenarios, or complete order lifecycle behavior. The production profile uses MySQL 8 and runs the Flyway schema migrations.
+The automated backend tests include a Spring context-load test, a critical business flow through MockMvc/H2, admin-bootstrap tests, and production configuration guard tests. The test profile uses a uniquely named in-memory H2 database and `ddl-auto=create-drop`. No production MySQL connection is available in this repository session. Production runtime currently disables Flyway and uses `ddl-auto=update`; SQL migrations are present but are not automatically run by the checked-in default configuration. Confirm the deployed schema and migration history before changing this strategy.

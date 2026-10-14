@@ -254,10 +254,10 @@ def state_diagram():
     # Notes for code paths and related enums.
     d.rounded_rectangle((520, 690, 1290, 925), radius=14, fill="#F7F9FC", outline="#7C8FA4", width=2)
     d.text((550, 715), "Observed BANKING confirmation path", font=font(25, True), fill=INK)
-    d.multiline_text((550, 758), "PaymentTransactionService.confirmPaymentByAdmin sets the linked order to\nCONFIRMED without checking its prior OrderStatus. This path is implemented\nseparately from OrderService.confirm; the transition above is the guarded flow.", font=font(22), fill=INK, spacing=7)
+    d.multiline_text((550, 758), "BANKING confirmation requires a PENDING transaction, PENDING order, and\nBANKING payment. It sets the order to CONFIRMED and writes a notification.\nOrderService.confirm uses the same PENDING state guard.", font=font(22), fill=INK, spacing=7)
     d.rounded_rectangle((380, 970, 1430, 1265), radius=14, fill=LIGHT, outline="#A9B5C2", width=2)
     d.text((550, 995), "Related status enums (not order states)", font=font(25, True), fill=INK)
-    d.multiline_text((410, 1040), "PaymentStatus: PENDING, PAID, FAILED. Code sets PENDING / PAID; no\nFAILED setter was found.\nPaymentTransaction.TransactionStatus: PENDING, CONFIRMED, REJECTED.\nconfirmPaymentByAdmin sets CONFIRMED; no REJECTED setter was found.", font=font(20), fill=INK, spacing=7)
+    d.multiline_text((410, 1040), "PaymentStatus: PENDING, PAID, FAILED; BANKING cancellation sets FAILED.\nPaymentTransaction: PENDING, CONFIRMED, REJECTED; cancellation sets REJECTED.\nSuccessful admin payment confirmation sets CONFIRMED / PAID.", font=font(20), fill=INK, spacing=7)
     # Transition rules footnote.
     d.text((70, 1305), "Evidence: OrderStatus.java; OrderService.java; PaymentTransactionService.java; PaymentStatus.java.", font=font(21), fill=GRAY)
     im.save(OUT / "state-order-payment.png", dpi=(240, 240))

@@ -22,13 +22,10 @@ public class AdminUserService {
     }
 
     @Transactional
-    public AdminUserResponse setActive(Long id, boolean active, String adminEmail) {
+    public AdminUserResponse setActive(Long id, boolean active) {
         var user = users.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy tài khoản."));
         if (user.getRole() != com.project_shopping.shopee.model.enums.Role.USER) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Chỉ có thể thay đổi trạng thái tài khoản khách hàng.");
-        }
-        if (!active && user.getEmail().equalsIgnoreCase(adminEmail)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn không thể vô hiệu hóa tài khoản đang đăng nhập.");
         }
         user.setActive(active);
         return new AdminUserResponse(user.getId(), user.getFullName(), user.getEmail(), user.getPhone(), user.getRole(), user.isActive(), user.getCreatedAt());

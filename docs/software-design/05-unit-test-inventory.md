@@ -2,7 +2,7 @@
 
 ## Mục tiêu và phạm vi
 
-Danh mục ưu tiên các nhánh có nghiệp vụ, dữ liệu, quyền hoặc side effect. Mã nguồn test hiện có chỉ là `ShopeeApplicationTests.contextLoads()` chạy Spring context với profile test; chưa thấy test unit cho service, controller, filter/query hoặc frontend trong các thư mục source đã rà soát. `pom.xml` có Spring Boot Test và H2; frontend `package.json` không khai báo test script/test runner. Theo yêu cầu, tài liệu này chỉ đề xuất test, không tạo hay chạy test code.
+Danh mục ưu tiên các nhánh có nghiệp vụ, dữ liệu, quyền hoặc side effect. Backend hiện có `CriticalBusinessFlowTests`, `AdminBootstrapTest`, `ProductionConfigurationGuardTest` và `ShopeeApplicationTests`; test luồng nghiệp vụ chính chạy MockMvc với profile H2. Frontend `package.json` không khai báo test script/test runner. Các mục dưới đây bổ sung phạm vi còn cần bao phủ, không thay thế kiểm thử tích hợp MySQL/concurrency.
 
 Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, case bất thường và ưu tiên. **P0** là logic có thể làm sai tiền/tồn/trạng thái đơn; **P1** là xác thực/quyền/dữ liệu catalog và luồng mua; **P2** là logic hỗ trợ, báo cáo và xử lý lỗi; **P3** là khởi tạo hoặc giao diện ít rủi ro hơn. Mức ưu tiên là đề xuất dựa trên tác động nếu sai, không phải phân loại do source khai báo.
 
@@ -14,7 +14,7 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 - **Đầu vào / đầu ra:** email user + `CheckoutRequest(shippingAddress, phone, paymentMethod)` → `OrderResponse`.
 - **Logic cần bao phủ:** user không tìm thấy → 401; cart vắng hoặc rỗng; cart có nhiều variant; variant lock thiếu; product INACTIVE; stock vừa đủ / thiếu; total dùng variant price; địa chỉ/phone trim; order PENDING; snapshot line; trừ tồn; payment COD/BANKING; BANKING tạo transaction; cart clear và updatedAt.
 - **Mock/fixture:** UserRepository, CartRepository, VariantRepository, OrderRepository, PaymentTransactionService, PaymentTransactionRepository, NotificationRepository; fixture với nhiều variant và order item.
-- **Case bất thường:** lỗi khi tạo transaction/lưu order/variant xảy ra thì kiểm tra rollback ở integration test; variant/cart bị xóa; tồn đổi trước checkout; tổng BigDecimal scale/giá lớn; cart line quantity <=0 chỉ kiểm qua DTO/persistence vì service nhận được object bất kỳ.
+- **Case bất thường:** lỗi khi tạo transaction/lưu order/variant xảy ra thì kiểm tra rollback ở integration test; variant/cart bị xóa; tồn đổi trước checkout; tổng bằng và vượt `999999999999.99` (giới hạn DECIMAL(14,2)); cart line quantity <=0 chỉ kiểm qua DTO/persistence vì service nhận được object bất kỳ.
 - **Ưu tiên / lý do:** P0 — một lỗi có thể ghi sai tổng tiền, trừ sai stock hoặc xóa giỏ mà không tạo đơn.
 
 ### UT-ORD-02 — OrderService.confirm, startDelivery, markDelivered, confirmReceipt
@@ -23,14 +23,14 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 - **Đầu vào / đầu ra:** order id, thêm email cho confirmReceipt → OrderResponse.
 - **Logic cần bao phủ:** từng trạng thái hợp lệ: PENDING→CONFIRMED→SHIPPING→DELIVERED→COMPLETED; ghi timestamp; mỗi chuyển trạng thái tạo đúng một notification; transition từ status khác trả 409; order thiếu 404; confirmReceipt kiểm owner trước status.
 - **Mock/fixture:** OrderRepository với `findByIdForUpdate`/`findDetailedById`, UserRepository, VariantRepository khi liên quan, NotificationRepository; dùng OrderStatus enum fixture.
-- **Case bất thường:** order khác owner phải biểu hiện 404; `timestampAfter` khi clock sớm hơn previous → 409; previous null; timestamp bằng previous được chấp nhận; lỗi notification phải rollback state khi chạy integration test.
+- **Case bất thường:** order khác owner phải biểu hiện 404; khi clock hiện tại sớm hơn previous, timestamp phải bằng previous (không trả 409); previous null; lỗi notification phải rollback state khi chạy integration test.
 - **Ưu tiên / lý do:** P0 — trạng thái điều khiển khả năng hủy, giao hàng và hoàn tất đơn.
 
 ### UT-ORD-03 — OrderService.cancelByCustomer, cancelPendingOrder, restoreInventory
 
 - **Vị trí:** `OrderService.java:159, 165, 172, 182`.
 - **Đầu vào / đầu ra:** email/id hoặc CustomerOrder → OrderResponse.
-- **Logic cần bao phủ:** chỉ owner + PENDING; admin cancel cũng chỉ PENDING; stock được cộng đúng theo từng order line; lock variant theo id tăng; notification và cancelledAt/status; các status khác → 409.
+- **Logic cần bao phủ:** chỉ owner + PENDING; admin cancel cũng chỉ PENDING; stock được cộng đúng theo từng order line; lock variant theo id tăng; notification và cancelledAt/status; transaction PENDING thành REJECTED; payment BANKING PENDING thành FAILED; các status khác → 409.
 - **Mock/fixture:** UserRepository, OrderRepository, VariantRepository, NotificationRepository; order nhiều variant với tồn hiện tại khác nhau.
 - **Case bất thường:** order không thuộc user → 404; variant đã mất → 409; `Math.addExact` tràn số; order line quantity sai; lỗi ở một variant sau khi variant trước đã được cập nhật cần transaction rollback.
 - **Ưu tiên / lý do:** P0 — hoàn stock sai gây bán vượt kho hoặc thất thoát tồn.
@@ -39,9 +39,9 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 
 - **Vị trí:** `src/main/java/com/project_shopping/shopee/service/PaymentTransactionService.java:76`.
 - **Đầu vào / đầu ra:** transaction id → `PaymentTransactionResponse`.
-- **Logic cần bao phủ:** không tìm thấy → 404; CONFIRMED → 400; PENDING → transaction CONFIRMED, order CONFIRMED và payment PAID; không có payment; kiểm tra order/payment/transaction được lưu và timestamp.
-- **Mock/fixture:** PaymentTransactionRepository, BankAccountRepository, OrderRepository; CustomerOrder với status/payment tương ứng.
-- **Case bất thường / hành vi cần chốt:** source cho phép xác nhận transaction REJECTED và không guard order status trước khi set CONFIRMED; không tạo notification và gọi Instant.now nhiều lần. Viết test characterization cho hành vi hiện tại, sau đó chủ sở hữu nghiệp vụ cần quyết định có giới hạn transition hay không.
+- **Logic cần bao phủ:** khóa order rồi transaction; thiếu transaction/order → 404; transaction/order không PENDING hoặc payment không phải BANKING → 409; trường hợp hợp lệ đồng bộ transaction CONFIRMED, order CONFIRMED, payment PAID và notification trong transaction; timestamp không lùi so với createdAt.
+- **Mock/fixture:** PaymentTransactionRepository (order id + lock), OrderRepository (lock/detail), NotificationRepository; Payment BANKING và Order PENDING.
+- **Case bất thường:** transaction REJECTED/CONFIRMED, order đã tiến triển/hủy, payment thiếu/COD, lỗi lưu notification phải rollback cả payment/order/transaction; đồng hồ sau lệch không làm timestamp lùi.
 - **Ưu tiên / lý do:** P0 — xác nhận sai có thể đánh dấu đơn chưa trả tiền thành đã trả hoặc đưa order status lùi.
 
 ## P1 — Danh tính, phân quyền, giỏ hàng và catalog
@@ -52,14 +52,14 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 - **Đầu vào / đầu ra:** RegisterRequest/LoginRequest → UserResponse/AuthResponse.
 - **Logic cần bao phủ:** chuẩn hóa tên/email; kiểm tra email trùng ignore-case; role cố định USER; hash password; sai email/sai password cùng trả 401; inactive đúng password trả 403; active trả token và role.
 - **Mock:** UserRepository, PasswordEncoder, JwtService.
-- **Case bất thường:** email blank/format sai do DTO validation; email có whitespace/case; race duplicate DB unique violation; password không được lưu plain text; repository trả empty.
+- **Case bất thường:** email blank/format sai do DTO validation; email có whitespace/case; race duplicate DB unique violation; password không được lưu plain text; login với mật khẩu trên 72 byte UTF-8 phải trả 401 đồng nhất, không ném lỗi BCrypt thành 500.
 - **Ưu tiên / lý do:** P1 — sai logic mở tài khoản hoặc cho inactive user đăng nhập ảnh hưởng truy cập toàn ứng dụng.
 
 ### UT-SEC-01 — JwtService và JwtAuthenticationFilter
 
 - **Vị trí:** `security/JwtService.java:28, 51, 70, 84`; `security/JwtAuthenticationFilter.java:34, 44, 61, 75, 91`.
 - **Đầu vào / đầu ra:** cấu hình secret/expiry; bearer header + request → SecurityContext được set hoặc để trống.
-- **Logic cần bao phủ:** secret <32 byte và expiry ≤0 bị từ chối; secret rỗng tạo khóa tạm; token subject/expiration/signature; bỏ qua route đã liệt kê; header thiếu/sai prefix; token hợp lệ nạp role từ DB; user inactive/không tồn tại không authenticate; JWT lỗi clear context.
+- **Logic cần bao phủ:** secret <32 byte và expiry ≤0 bị từ chối; secret rỗng bị fail-fast; token subject/expiration/signature; bỏ qua route đã liệt kê; header thiếu/sai prefix; token hợp lệ nạp role từ DB; user inactive/không tồn tại không authenticate; JWT lỗi clear context; lỗi truy vấn user trả 503 JSON thống nhất.
 - **Mock:** UserRepository, JwtService; request/response/filter chain và SecurityContext.
 - **Case bất thường:** token hết hạn, sửa chữ ký, bearer rỗng, header viết thường `bearer ` (source yêu cầu prefix đúng `Bearer `), context đã có auth; token role claim khác role DB.
 - **Ưu tiên / lý do:** P1 — nền tảng cho mọi quyền API; test route matcher thêm qua MockMvc.
@@ -77,7 +77,7 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 
 - **Vị trí:** `service/CartService.java:48, 106, 147`.
 - **Đầu vào / đầu ra:** email, CartItemRequest hoặc line id/CartQuantityRequest → CartResponse/void.
-- **Logic cần bao phủ:** add tạo cart; variant line mới; variant lặp cộng quantity; tồn vừa đủ/vượt; product ACTIVE/INACTIVE; update theo đúng user; delete line; cart total từ variant price.
+- **Logic cần bao phủ:** add tạo cart; variant line mới; variant lặp cộng quantity; tồn vừa đủ/vượt; product ACTIVE/INACTIVE; update theo đúng user; delete line; cart total từ variant price; cộng quantity tràn int phải bị từ chối.
 - **Mock:** UserRepository, CartRepository, VariantRepository.
 - **Case bất thường:** user/variant/cart/line không có; line id thuộc user khác; quantity null/0 bị DTO chặn; cạnh tranh update tồn; unique cart-user/cart-variant.
 - **Ưu tiên / lý do:** P1 — tác động tới trải nghiệm giỏ và là input trực tiếp cho checkout.
@@ -86,7 +86,7 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 
 - **Vị trí:** `service/ProductService.java:51, 160`.
 - **Đầu vào / đầu ra:** filter scalars + page/pageSize/sort → ProductPageResponse.
-- **Logic cần bao phủ:** biên page 0/10000; size 1/100; giá null/0/âm; min=max/min>max; năm loại sort; sort case-insensitive; mặc định newest khi null; mapping metadata Page.
+- **Logic cần bao phủ:** biên page 0/10000; size 1/100; giá null/0/âm; min=max/min>max; năm loại sort; sort case-insensitive; mặc định newest khi null; tie-breaker id ổn định; mapping metadata Page; query trang nạp category và batch variants.
 - **Mock:** ProductRepository SpecificationExecutor trả Page<Product>; ProductSpecifications có thể assert được truyền filter tương ứng.
 - **Case bất thường:** page/size ngoài biên, unknown sort, BigDecimal scale, giá min lớn hơn max; category blank/type alias do controller.
 - **Ưu tiên / lý do:** P1 — lỗi lọc có thể làm sai danh mục và có thể gây truy vấn quá lớn.
@@ -118,6 +118,15 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 - **Case bất thường:** product/variant thiếu, mismatched parent 404, duplicate size/color, delete variant đã FK reference → 409.
 - **Ưu tiên / lý do:** P1 — biến thể xác định giá và stock thực khi mua.
 
+### UT-PRICE-01 — WholeVndAmountValidator / giá product và variant
+
+- **Vị trí:** `validation/WholeVndAmountValidator.java`; annotation gắn trên `ProductRequest.price` và `VariantRequest.price` trong `dto/ApiDtos.java`; response validation do `ApiExceptionHandler` ánh xạ.
+- **Đầu vào / đầu ra:** `BigDecimal` nullable → boolean; qua API là request hợp lệ 201/200 hoặc lỗi validation 400.
+- **Logic cần bao phủ:** null validator cho qua để các constraint `@NotNull` chịu trách nhiệm; số nguyên và số có scale `.00` hợp lệ; giá trị có phần lẻ khác 0 bị từ chối; `@Digits(10,2)` vẫn giới hạn precision riêng.
+- **Mock / test seam:** validator unit test; MockMvc hồi quy đã kiểm tra variant giá `199000.00` được nhận và `199000.50` trả 400 mà không ghi DB.
+- **Case bất thường:** số âm (do `@DecimalMin`), số vượt precision, scale âm của BigDecimal, giá có nhiều số 0 ở cuối, phần lẻ nhỏ nhất khác 0.
+- **Ưu tiên / lý do:** P0 — BANKING checkout gọi `toBigIntegerExact()` trên tổng tiền; chặn fraction ở API tránh lưu giá không thể thanh toán theo luồng hiện tại.
+
 ### UT-CAT-03 — CategoryService.create/update/delete/requireActive
 
 - **Vị trí:** `service/CategoryService.java:43, 57, 79, 93, 116`.
@@ -139,28 +148,28 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 ### UT-ADMIN-01 — AdminUserService.setActive
 
 - **Vị trí:** `service/AdminUserService.java:25`.
-- **Đầu vào / đầu ra:** user id/active/adminEmail → AdminUserResponse.
+- **Đầu vào / đầu ra:** user id/active → AdminUserResponse.
 - **Logic cần bao phủ:** chỉ role USER; chặn tự vô hiệu hóa theo email ignore-case; bật/tắt thành công; trả trạng thái mới.
 - **Mock:** UserRepository.
 - **Case bất thường:** thiếu id→404; ADMIN/role null→403 (role enum không null theo mapping); admin casing/whitespace; admin khác tài khoản hiện tại vẫn không thể bị đổi do chỉ USER.
 - **Ưu tiên / lý do:** P1 — thay đổi active ảnh hưởng JWT filter và khả năng truy cập.
 
-### UT-BANK-01 — AdminBankController.saveBankAccount
+### UT-BANK-01 — BankAccountService.saveActiveAccount
 
-- **Vị trí:** `controller/AdminBankController.java:36`.
+- **Vị trí:** `service/BankAccountService.java:20`; `repository/BankAccountRepository.java`.
 - **Đầu vào / đầu ra:** BankAccountRequest → BankAccountResponse 201.
-- **Logic cần bao phủ:** trim/uppercase bank code, uppercase account name; qrTemplate null thành “compact”; tạo row mới active; list/public query chọn active row cao id.
-- **Mock:** BankAccountRepository.
-- **Case bất thường / hành vi cần chốt:** existing rows bị setActive(false) nhưng không được save rõ ràng; controller không `@Transactional`. Test persistence để xác minh có nhiều row active hay không; tránh chỉ kiểm object mock.
-- **Ưu tiên / lý do:** P1 — checkout chuyển khoản phụ thuộc account được chọn; hành vi single-active chưa được đảm bảo bởi source persistence.
+- **Logic cần bao phủ:** transaction bao quanh việc khóa các row hiện có, tắt active rồi lưu row mới; trim, uppercase theo Locale.ROOT; giới hạn DTO theo chiều dài cột; list/public query chọn active row id lớn nhất.
+- **Mock:** BankAccountRepository; integration test MySQL cho locking.
+- **Case bất thường / hành vi cần chốt:** request vượt cột trả 400; nhiều lệnh admin đồng thời; insert đồng thời khi bảng chưa có row; unique active chưa được khai báo ở schema/entity.
+- **Ưu tiên / lý do:** P1 — checkout chuyển khoản phụ thuộc account được chọn và thao tác thay thế có cạnh tranh.
 
 ### UT-PAY-02 — createTransactionForOrder và PaymentMemoUtil
 
 - **Vị trí:** `service/PaymentTransactionService.java:43`; `util/PaymentMemoUtil.java:16, 30`.
 - **Đầu vào / đầu ra:** CustomerOrder → PaymentTransaction; tên/mã/amount → string.
-- **Logic cần bao phủ:** không item fallback AO; lấy snapshot hoặc product current name; strip dấu/ký tự; cắt 12; nhiều item append PLUS; random code length 4; amount longValue; account active mới nhất hoặc N/A; order code format; transaction status default PENDING.
+- **Logic cần bao phủ:** lấy snapshot hoặc product current name; fallback AO cho tên vắng hoặc không Latin; strip dấu/ký tự; cắt tên 12; nhiều item append PLUS; code SecureRandom dài 8; amount nguyên VND trong memo; yêu cầu bank active (thiếu → 409); order code format; transaction status default PENDING.
 - **Mock:** BankAccountRepository, PaymentTransactionRepository; util random không cần mock nếu assert pattern/length.
-- **Case bất thường:** tên null/blank/emoji/tiếng Việt/độ dài biên; amount có lẻ (memo bỏ phần thập phân nhưng transaction giữ BigDecimal); length âm/0; collision code; không có bank.
+- **Case bất thường:** tên null/blank/emoji/tiếng Việt/độ dài biên; total có phần lẻ → 400; code length âm/0 nếu gọi util trực tiếp; collision code; không có bank.
 - **Ưu tiên / lý do:** P1 — lỗi memo hoặc account gây đối soát chuyển khoản nhầm.
 
 ## P2 — Wishlist, notifications, thống kê, mapping lỗi và frontend
@@ -295,10 +304,10 @@ Mỗi mục ghi đơn vị, đầu vào/đầu ra, nhánh chính, mock/fixture, 
 
 ## Lưu ý trước khi viết test
 
-- Profile `test` dùng H2 và Flyway off; các migrations MySQL không chạy. Chốt schema boot strategy trước test repository.
-- Timestamps dùng `Instant.now()` trực tiếp; assertion nên so trạng thái/mốc có mặt và thứ tự, hoặc sau này inject `Clock` nếu cần test mốc chính xác.
-- Test `AdminBankController.saveBankAccount` với DB thật để xác minh inactive row persistence; test Mockito đơn thuần sẽ không bắt vấn đề persistence context.
+- Profile `test` dùng H2 với tên DB `${random.uuid}`, Flyway off và `ddl-auto=create-drop`; các migrations MySQL không chạy. Cần đối chiếu MySQL thật cho semantics khóa, migration và truy vấn thống kê.
+- Timestamps dùng `Instant.now()` trực tiếp; assertion nên kiểm soát thứ tự và tính không-lùi. Có thể inject `Clock` trong thay đổi riêng nếu cần xác minh giá trị tuyệt đối.
+- Kiểm thử thay bank account đồng thời trên MySQL để xác minh lock với isolation thực tế; H2 không chứng minh gap lock của MySQL khi bảng rỗng.
 - `OrderService.checkout` gọi conversion DTO và persistence trong cùng service; test mock nên kiểm cả `PaymentTransactionService` call conditional COD/BANKING.
-- Trạng thái REJECTED của payment transaction hiện không có API để gán; behavior confirm từ REJECTED nên được characterization trước khi quyết định yêu cầu mới.
-- Không chạy test và không thay đổi ứng dụng trong bước lập tài liệu này.
+- Transaction REJECTED được gán khi hủy order; API xác nhận hiện từ chối transaction không còn PENDING bằng 409.
+- `mvnw.cmd -o verify` gần nhất chạy thành công với 8 test, không có failure/error; test suite chưa bao phủ MySQL production hay toàn bộ API.
 

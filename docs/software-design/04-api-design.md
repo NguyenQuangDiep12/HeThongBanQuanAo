@@ -26,20 +26,21 @@ Backend dùng REST controllers dưới `/api`, trao đổi JSON. Endpoint đư�
 | Trùng/ràng buộc persistence | 409 | DataIntegrityViolationException handler |
 | Không đăng nhập | 401 | Security authentication entry point |
 | Sai role | 403 | Security access denied handler |
+| Database tạm thời không truy cập được trong JWT user lookup | 503 JSON | JwtAuthenticationFilter |
 | Lỗi chưa xử lý | 500, message tổng quát; log exception | ApiExceptionHandler |
 
-Validation response chọn lỗi field đầu tiên. Nội dung/field labels được localize trong `ApiExceptionHandler`; không có schema OpenAPI/Swagger trong dependency hiện tại.
+Validation response chọn lỗi field đầu tiên. Nội dung được ánh xạ theo mã constraint (không theo default message locale của Bean Validation), `Size` đọc min/max; field labels được localize trong `ApiExceptionHandler`. Không có schema OpenAPI/Swagger trong dependency hiện tại.
 
 ## Authentication và hồ sơ
 
 | Method / endpoint | Request | Thành công | Controller → xử lý | Bảo vệ / lỗi chính |
 |---|---|---|---|---|
 | POST `/api/auth/register` | RegisterRequest: fullName, email, password bắt buộc; phone tùy chọn | 201 UserResponse | AuthController.register → AuthService.register | Public; validation 400, email trùng 409 |
-| POST `/api/auth/login` | LoginRequest: email/password bắt buộc | 200 AuthResponse(accessToken,userId,role) | AuthController.login → AuthService.login | Public; sai thông tin 401, user inactive 403 |
+| POST `/api/auth/login` | LoginRequest: email/password bắt buộc | 200 AuthResponse(accessToken,userId,role) | AuthController.login → AuthService.login | Public; sai thông tin hoặc password >72 byte UTF-8 → 401; user inactive → 403 |
 | GET `/api/auth/me` | Bearer token | 200 UserResponse | AuthController.me → AuthService.profile | USER/ADMIN; token/account không hợp lệ thường 401 |
 | PUT `/api/auth/me` | ProfileUpdateRequest: fullName bắt buộc ≤120, phone tùy chọn ≤30 | 200 UserResponse | AuthController.updateProfile → AuthService.updateProfile | USER/ADMIN; validation 400 |
 
-RegisterRequest còn yêu cầu email đúng định dạng và ≤190; password chỉ ràng buộc not blank ở backend. Role không nhận từ client, service luôn tạo USER.
+RegisterRequest còn yêu cầu email đúng định dạng và ≤190; password DTO giới hạn 8–72 ký tự, service bổ sung giới hạn 72 byte UTF-8 để tương thích BCrypt. Role không nhận từ client, service luôn tạo USER.
 
 ## Catalog và sản phẩm
 
@@ -64,11 +65,11 @@ Trong list endpoint, nếu `category` khác null và không blank thì dùng gi�
 | PUT `/api/admin/categories/{id}` | CategoryRequest | 200 CategoryResponse | update → update | Không có 404; duplicate tên 409; active null giữ nguyên |
 | DELETE `/api/admin/categories/{id}` | id | 204 | delete → delete | Có product ref thì 409; không có thì xóa |
 | GET `/api/admin/products` | — | 200 List<ProductResponse> | AdminProductController.getAllProducts → listAll | ADMIN; gồm trạng thái inactive |
-| POST `/api/admin/products` | ProductRequest: name ≤180, categoryId positive, price ≥0.01, imageUrl ≤1000; status tùy chọn | 201 ProductResponse | createProduct → ProductService.create | Category phải tồn tại/active; DTO lỗi 400 |
+| POST `/api/admin/products` | ProductRequest: name ≤180, categoryId positive, price ≥0.01, DECIMAL(12,2), số nguyên VND (`199000.00` hợp lệ; `199000.50` không hợp lệ), imageUrl ≤1000; status tùy chọn | 201 ProductResponse | createProduct → ProductService.create | Category phải tồn tại/active; DTO lỗi 400 |
 | PUT `/api/admin/products/{id}` | ProductRequest | 200 ProductResponse | updateProduct → update | Product không tồn tại 404; category không hợp lệ 400 |
 | DELETE `/api/admin/products/{id}` | id | 204 | deactivateProduct → deactivate | Soft delete: status INACTIVE; không xóa entity |
-| POST `/api/admin/products/{productId}/variants` | VariantRequest: size ≤40/color ≤60 bắt buộc, stock ≥0, price ≥0.01 | 201 VariantResponse | addVariant → addVariant | Product thiếu 404; duplicate (product,size,color) DB conflict 409 |
-| PUT `/api/admin/products/{productId}/variants/{variantId}` | VariantRequest | 200 VariantResponse | updateVariant → updateVariant | Variant thiếu/không thuộc product 404; DB conflict 409 |
+| POST `/api/admin/products/{productId}/variants` | VariantRequest: size ≤40/color ≤60 bắt buộc, stock ≥0, price ≥0.01, DECIMAL(12,2), số nguyên VND (`.00` hợp lệ; phần lẻ khác 0 không hợp lệ) | 201 VariantResponse | addVariant → addVariant | Product thiếu 404; validation giá 400; duplicate (product,size,color) DB conflict 409 |
+| PUT `/api/admin/products/{productId}/variants/{variantId}` | VariantRequest như trên | 200 VariantResponse | updateVariant → updateVariant | Variant thiếu/không thuộc product 404; DB conflict 409 |
 | DELETE `/api/admin/products/{productId}/variants/{variantId}` | ids | 204 | deleteVariant → deleteVariant | Variant sai cha/thiếu 404; lỗi xóa persistence đổi thành 409 |
 
 ## Giỏ hàng và đơn
@@ -79,7 +80,7 @@ Trong list endpoint, nếu `category` khác null và không blank thì dùng gi�
 | POST `/api/cart/items` | CartItemRequest: variantId và quantity positive | 201 CartResponse | addItem → CartService.add | Product inactive/quantity vượt stock → 400; variant thiếu 404 |
 | PUT `/api/cart/items/{id}` | CartQuantityRequest: quantity positive | 200 CartResponse | updateItem → update | Item không thuộc cart/variant thiếu → 404; inactive/vượt stock → 400 |
 | DELETE `/api/cart/items/{id}` | line id | 204 | deleteItem → delete | Item/cart không tồn tại → 404 |
-| POST `/api/orders` | CheckoutRequest: shippingAddress ≤500, phone ≤30 bắt buộc; paymentMethod COD/BANKING | 201 OrderResponse | OrderController.checkout → OrderService.checkout | USER; giỏ rỗng, product inactive, variant thiếu, tồn thiếu → 400 |
+| POST `/api/orders` | CheckoutRequest: shippingAddress ≤500, phone ≤30 bắt buộc; paymentMethod COD/BANKING | 201 OrderResponse | OrderController.checkout → OrderService.checkout | USER; giỏ rỗng, product inactive, variant thiếu, tồn thiếu, tổng vượt DECIMAL(14,2) → 400; BANKING không có tài khoản active → 409 |
 | GET `/api/orders` | Bearer USER | 200 List<OrderResponse> | getMyOrders → myOrders | Chỉ đơn của user hiện tại |
 | GET `/api/orders/{id}` | id | 200 OrderResponse | getOrderDetail → myOrder | Không có hoặc không sở hữu → 404 |
 | PUT `/api/orders/{id}/cancel` | id | 200 OrderResponse | cancelOrder → cancelByCustomer | Owner và PENDING mới được hủy; khác trạng thái 409; hủy trả stock |
@@ -101,13 +102,13 @@ Trong list endpoint, nếu `category` khác null và không blank thì dùng gi�
 | POST `/api/wishlist/{productId}` | product id | 201 List<ProductResponse> | add → add | Add idempotent nếu đã có; product không active/category inactive → 404 |
 | DELETE `/api/wishlist/{productId}` | product id | 204 | remove → remove | Không có row thì no-op |
 | GET `/api/bank-accounts/active` | — | 200 BankAccountResponse | PublicBankController.getActiveBank | Public; chưa có active → 404 |
-| POST `/api/admin/bank-accounts` | BankAccountRequest: bankCode/bankName/accountNo/accountName không blank, qrTemplate tùy chọn | 201 BankAccountResponse | AdminBankController.saveBankAccount | ADMIN; trim và uppercase một số field; row mới mặc định active |
+| POST `/api/admin/bank-accounts` | BankAccountRequest: bankCode ≤20, bankName ≤100, accountNo ≤50, accountName ≤120; không blank; qrTemplate nullable ≤20 | 201 BankAccountResponse | AdminBankController.saveBankAccount → BankAccountService.saveActiveAccount | ADMIN; trim và uppercase theo Locale.ROOT một số field; khóa các row hiện có rồi lưu row mới active |
 | GET `/api/admin/bank-accounts` | — | 200 List<BankAccountResponse> | listBankAccounts | ADMIN |
 | GET `/api/admin/payment-transactions` | — | 200 List<PaymentTransactionResponse> | listTransactionsForUniver → getAllTransactionsForUniver | ADMIN; mới nhất trước |
-| PUT `/api/admin/payment-transactions/{id}/confirm` | id | 200 PaymentTransactionResponse | confirmPayment → confirmPaymentByAdmin | ADMIN; transaction thiếu 404, đã CONFIRMED 400; service còn lại đặt paid/order confirmed |
+| PUT `/api/admin/payment-transactions/{id}/confirm` | id | 200 PaymentTransactionResponse | confirmPayment → confirmPaymentByAdmin | ADMIN; transaction/order thiếu 404; trạng thái không PENDING hoặc payment không phải BANKING → 409; thành công đặt transaction CONFIRMED, order CONFIRMED, payment PAID và tạo notification |
 | GET `/api/admin/statistics` | — | 200 AdminStatisticsResponse | AdminStatisticsController.dashboard → dashboard | ADMIN; threshold low stock là 5; top 10 completed products |
 | GET `/api/admin/users` | — | 200 List<AdminUserResponse> | AdminUserController.list → list | ADMIN |
-| PUT `/api/admin/users/{id}/active` | ActiveRequest `{active: boolean}` bắt buộc | 200 AdminUserResponse | setActive → AdminUserService.setActive | ADMIN; chỉ USER, không tự vô hiệu hóa admin hiện tại; thiếu 404/role 403/self 400 |
+| PUT `/api/admin/users/{id}/active` | ActiveRequest `{active: boolean}` bắt buộc | 200 AdminUserResponse | setActive → AdminUserService.setActive | ADMIN; chỉ USER; thiếu 404, target role khác USER 403 |
 
 ## DTO và validation dùng chung
 

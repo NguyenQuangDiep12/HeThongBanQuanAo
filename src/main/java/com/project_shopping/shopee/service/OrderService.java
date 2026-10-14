@@ -16,6 +16,10 @@ import java.util.*;
 
 @Service
 public class OrderService {
+
+    // DECIMAL(14,2) is used by orders.total_amount, order_items.sub_total,
+    // payments.amount, and payment_transactions.amount.
+    private static final BigDecimal MAX_PERSISTABLE_ORDER_AMOUNT = new BigDecimal("999999999999.99");
     private final OrderRepository orders;
     private final UserRepository users;
     private final CartRepository carts;
@@ -72,6 +76,10 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         if (total.signum() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tổng tiền đơn hàng không hợp lệ.");
+        }
+        if (total.compareTo(MAX_PERSISTABLE_ORDER_AMOUNT) > 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Tổng tiền đơn hàng vượt quá giới hạn dữ liệu cho phép.");
         }
         CustomerOrder order = new CustomerOrder(user, request.shippingAddress().trim(), request.phone().trim(), total);
         for (CartItem item : cart.getItems()) {
@@ -184,6 +192,10 @@ public class OrderService {
                         == PaymentTransaction.TransactionStatus.PENDING)
                 .forEach(transaction -> transaction.setStatus(
                         PaymentTransaction.TransactionStatus.REJECTED));
+        if (order.getPayment() != null
+                && order.getPayment().getPaymentMethod() == com.project_shopping.shopee.model.enums.PaymentMethod.BANKING) {
+            order.getPayment().setPaymentStatus(com.project_shopping.shopee.model.enums.PaymentStatus.FAILED);
+        }
         restoreInventory(order);
         order.setStatus(OrderStatus.CANCELLED);
         order.setCancelledAt(cancelledAt);
@@ -234,11 +246,7 @@ public class OrderService {
 
     private Instant timestampAfter(Instant previous) {
         Instant now = Instant.now();
-        if (previous != null && now.isBefore(previous)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Thời gian hệ thống không hợp lệ để cập nhật trạng thái đơn hàng.");
-        }
-        return now;
+        return previous != null && now.isBefore(previous) ? previous : now;
     }
 
     private void notifyCustomer(CustomerOrder order, String title, String message) {

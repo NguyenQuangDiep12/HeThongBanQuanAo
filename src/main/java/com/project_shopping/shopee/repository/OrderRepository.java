@@ -91,13 +91,13 @@ public interface OrderRepository
 
     @Query("""
             SELECT oi.variant.product.id,
-                   COALESCE(oi.productNameSnapshot, oi.variant.product.name),
+                   MAX(COALESCE(oi.productNameSnapshot, oi.variant.product.name)),
                    SUM(oi.quantity),
                    SUM(oi.subTotal)
             FROM OrderItem oi
             WHERE oi.order.status = :status
-            GROUP BY oi.variant.product.id, COALESCE(oi.productNameSnapshot, oi.variant.product.name)
-            ORDER BY SUM(oi.quantity) DESC
+            GROUP BY oi.variant.product.id
+            ORDER BY SUM(oi.quantity) DESC, oi.variant.product.id ASC
             """)
     List<Object[]> findTopSellingProducts(@Param("status") OrderStatus status, org.springframework.data.domain.Pageable pageable);
 

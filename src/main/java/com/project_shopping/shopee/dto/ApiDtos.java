@@ -6,8 +6,10 @@ import com.project_shopping.shopee.model.enums.PaymentMethod;
 import com.project_shopping.shopee.model.enums.PaymentStatus;
 import com.project_shopping.shopee.model.enums.ProductStatus;
 import com.project_shopping.shopee.model.enums.Role;
+import com.project_shopping.shopee.validation.WholeVndAmount;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
@@ -87,6 +89,8 @@ public final class ApiDtos {
 
             @NotNull
             @DecimalMin("0.01")
+            @Digits(integer = 10, fraction = 2)
+            @WholeVndAmount
             BigDecimal price,
 
             @Size(max = 1000)
@@ -111,6 +115,8 @@ public final class ApiDtos {
 
             @NotNull
             @DecimalMin("0.01")
+            @Digits(integer = 10, fraction = 2)
+            @WholeVndAmount
             BigDecimal price
     ) {
     }

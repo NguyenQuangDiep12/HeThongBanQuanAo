@@ -1,47 +1,39 @@
 package com.project_shopping.shopee.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.core.Ordered;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Profiles;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
-/** Fails fast outside local/test profiles when production-only credentials are unsafe or absent. */
-@Component
-@Profile("!dev & !test")
-public class ProductionConfigurationGuard implements ApplicationRunner {
+/** Validates production settings before Spring creates the datasource or Hibernate schema. */
+public final class ProductionConfigurationGuard implements EnvironmentPostProcessor, Ordered {
 
-    private final String databaseUrl;
-    private final String databaseUsername;
-    private final String databasePassword;
-    private final String jwtSecret;
-    private final String adminEmail;
-    private final String adminPassword;
-
-    public ProductionConfigurationGuard(
-            @Value("${spring.datasource.url}") String databaseUrl,
-            @Value("${spring.datasource.username}") String databaseUsername,
-            @Value("${spring.datasource.password}") String databasePassword,
-            @Value("${app.jwt.secret}") String jwtSecret,
-            @Value("${app.bootstrap-admin.email:}") String adminEmail,
-            @Value("${app.bootstrap-admin.password:}") String adminPassword) {
-        this.databaseUrl = databaseUrl;
-        this.databaseUsername = databaseUsername;
-        this.databasePassword = databasePassword;
-        this.jwtSecret = jwtSecret;
-        this.adminEmail = adminEmail;
-        this.adminPassword = adminPassword;
+    @Override
+    public int getOrder() {
+        // Run after ConfigDataEnvironmentPostProcessor has loaded application.properties and profiles.
+        return Ordered.LOWEST_PRECEDENCE;
     }
 
     @Override
-    public void run(ApplicationArguments args) {
-        validate();
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        if (environment.acceptsProfiles(Profiles.of("dev", "test"))) {
+            return;
+        }
+        validate(
+                environment.getProperty("spring.datasource.url"),
+                environment.getProperty("spring.datasource.username"),
+                environment.getProperty("spring.datasource.password"),
+                environment.getProperty("app.jwt.secret"),
+                environment.getProperty("app.bootstrap-admin.email", ""),
+                environment.getProperty("app.bootstrap-admin.password", ""));
     }
 
-    void validate() {
+    static void validate(String databaseUrl, String databaseUsername, String databasePassword,
+                         String jwtSecret, String adminEmail, String adminPassword) {
         if (databaseUsername == null || databaseUsername.isBlank()
                 || "root".equalsIgnoreCase(databaseUsername.trim())) {
             throw new IllegalStateException("Production must use a dedicated, non-root database account.");
@@ -57,11 +49,17 @@ public class ProductionConfigurationGuard implements ApplicationRunner {
         if (jwtSecret == null || jwtSecret.getBytes(StandardCharsets.UTF_8).length < 32) {
             throw new IllegalStateException("Production JWT_SECRET must contain at least 32 bytes.");
         }
-        if (adminEmail == null || adminEmail.isBlank()
-                || adminPassword == null || adminPassword.length() < 8
-                || adminPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
+
+        // Bootstrap credentials are a one-time provisioning option, not a permanent runtime secret.
+        boolean emailConfigured = adminEmail != null && !adminEmail.isBlank();
+        boolean passwordConfigured = adminPassword != null && !adminPassword.isBlank();
+        if (emailConfigured != passwordConfigured) {
             throw new IllegalStateException(
-                    "Production must provide ADMIN_EMAIL and an ADMIN_PASSWORD of 8–72 UTF-8 bytes.");
+                    "ADMIN_EMAIL and ADMIN_PASSWORD must be configured together when bootstrapping an admin.");
+        }
+        if (passwordConfigured && (adminPassword.length() < 8
+                || adminPassword.getBytes(StandardCharsets.UTF_8).length > 72)) {
+            throw new IllegalStateException("ADMIN_PASSWORD must contain 8–72 UTF-8 bytes when configured.");
         }
     }
 }

@@ -15,6 +15,7 @@ import com.project_shopping.shopee.repository.BankAccountRepository;
 import com.project_shopping.shopee.repository.CategoryRepository;
 import com.project_shopping.shopee.repository.CartRepository;
 import com.project_shopping.shopee.repository.OrderRepository;
+import com.project_shopping.shopee.repository.NotificationRepository;
 import com.project_shopping.shopee.repository.PaymentTransactionRepository;
 import com.project_shopping.shopee.repository.ProductRepository;
 import com.project_shopping.shopee.repository.VariantRepository;
@@ -24,10 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,6 +60,8 @@ class CriticalBusinessFlowTests {
     @Autowired private OrderRepository orders;
     @Autowired private PaymentTransactionRepository transactions;
     @Autowired private BankAccountRepository bankAccounts;
+    @Autowired private NotificationRepository notifications;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     @Test
     void preventsQuantityOverflowAndSerializesBankingCancellationAndOrderLifecycle() throws Exception {
@@ -72,10 +78,19 @@ class CriticalBusinessFlowTests {
 
         mvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("Accept-Language", "fr")
                         .content("""
                                 {"fullName":"Weak Password","email":"weak-%s@example.test","password":"1234567"}
                                 """.formatted(suffix)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("mật khẩu phải có từ 8 đến 72 ký tự."));
+
+        mvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"%s","password":"%s"}
+                                """.formatted(customerEmail, "x".repeat(73))))
+                .andExpect(status().isUnauthorized());
 
         String customerToken = login(customerEmail, CUSTOMER_PASSWORD);
         String adminToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
@@ -99,6 +114,44 @@ class CriticalBusinessFlowTests {
         ProductVariant variant = variants.save(new ProductVariant(
                 savedProduct, "M", "Black", 5, new BigDecimal("2500.00")));
 
+        long productsBeforePriceValidation = products.count();
+        mvc.perform(post("/api/admin/products")
+                        .header("Authorization", bearer(adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Whole price %s","categoryId":%d,"description":"VND fixture","price":199000.00}
+                                """.formatted(suffix, category.getId())))
+                .andExpect(status().isCreated());
+        long productsAfterWholePrice = products.count();
+        mvc.perform(post("/api/admin/products")
+                        .header("Authorization", bearer(adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Fractional price %s","categoryId":%d,"description":"VND fixture","price":199000.50}
+                                """.formatted(suffix, category.getId())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("giá phải là số nguyên VND."));
+        assertThat(products.count()).isEqualTo(productsAfterWholePrice);
+        assertThat(productsAfterWholePrice).isEqualTo(productsBeforePriceValidation + 1);
+
+        mvc.perform(post("/api/admin/products/{productId}/variants", savedProduct.getId())
+                        .header("Authorization", bearer(adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"size":"L","color":"Red","stockQuantity":1,"price":199000.00}
+                                """))
+                .andExpect(status().isCreated());
+        long variantsBeforeInvalidPrice = variants.count();
+        mvc.perform(post("/api/admin/products/{productId}/variants", savedProduct.getId())
+                        .header("Authorization", bearer(adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"size":"XL","color":"Blue","stockQuantity":1,"price":199000.50}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("giá phải là số nguyên VND."));
+        assertThat(variants.count()).isEqualTo(variantsBeforeInvalidPrice);
+
         // Re-adding Integer.MAX_VALUE used to wrap the accumulated int quantity negative.
         addCartItem(customerToken, variant.getId(), Integer.MAX_VALUE)
                 .andExpect(status().isBadRequest());
@@ -111,11 +164,33 @@ class CriticalBusinessFlowTests {
         User buyer = users.findByEmailIgnoreCase(customerEmail).orElseThrow();
         Cart buyerCart = carts.findByUserId(buyer.getId()).orElseThrow();
         CartItem storedLine = buyerCart.getItems().get(0);
-        storedLine.setQuantity(-1); // Simulate a corrupt legacy row; the API must still reject checkout.
-        carts.save(buyerCart);
+
+        // DECIMAL(14,2) caps the persisted order/subtotal amount at 999,999,999,999.99.
+        variant.setPrice(new BigDecimal("9999999999.00"));
+        variant.setStockQuantity(101);
+        variants.saveAndFlush(variant);
+        storedLine.setQuantity(101);
+        carts.saveAndFlush(buyerCart);
         String checkout = """
                 {"shippingAddress":"1 Test Street","phone":"0900000000","paymentMethod":"BANKING"}
                 """;
+        mvc.perform(post("/api/orders")
+                        .header("Authorization", bearer(customerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(checkout))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Tổng tiền đơn hàng vượt quá giới hạn dữ liệu cho phép."));
+        assertThat(orders.count()).isZero();
+        assertThat(variants.findById(variant.getId()).orElseThrow().getStockQuantity()).isEqualTo(101);
+
+        storedLine.setQuantity(3);
+        carts.saveAndFlush(buyerCart);
+        variant.setPrice(new BigDecimal("2500.00"));
+        variant.setStockQuantity(5);
+        variants.saveAndFlush(variant);
+
+        storedLine.setQuantity(-1); // Simulate a corrupt legacy row; the API must still reject checkout.
+        carts.save(buyerCart);
         mvc.perform(post("/api/orders")
                         .header("Authorization", bearer(customerToken))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -174,7 +249,8 @@ class CriticalBusinessFlowTests {
         mvc.perform(put("/api/orders/{id}/cancel", bankingOrderId)
                         .header("Authorization", bearer(customerToken)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("CANCELLED"));
+                .andExpect(jsonPath("$.status").value("CANCELLED"))
+                .andExpect(jsonPath("$.payment.paymentStatus").value("FAILED"));
         var cancelledTransactions = transactions.findAll().stream()
                 .filter(transaction -> transaction.getOrder().getId().equals(bankingOrderId))
                 .toList();
@@ -200,7 +276,7 @@ class CriticalBusinessFlowTests {
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andReturn().getResponse().getContentAsString());
         long paidBankingOrderId = paidBankingOrder.get("id").asLong();
-        PaymentTransaction pendingTransaction = transactions.findByOrderId(paidBankingOrderId).orElseThrow();
+        PaymentTransaction pendingTransaction = transactions.findFirstByOrderIdOrderByCreatedAtDesc(paidBankingOrderId).orElseThrow();
         mvc.perform(put("/api/admin/payment-transactions/{id}/confirm", pendingTransaction.getId())
                         .header("Authorization", bearer(adminToken)))
                 .andExpect(status().isOk())
@@ -209,6 +285,9 @@ class CriticalBusinessFlowTests {
                 .isEqualTo(PaymentTransaction.TransactionStatus.CONFIRMED);
         assertThat(orders.findById(paidBankingOrderId).orElseThrow().getStatus())
                 .isEqualTo(OrderStatus.CONFIRMED);
+        assertThat(notifications.findAllByUserIdOrderByCreatedAtDesc(buyer.getId()))
+                .anySatisfy(notification -> assertThat(notification.getTitle())
+                        .isEqualTo("Đơn hàng đã được xác nhận"));
         mvc.perform(get("/api/admin/orders/{id}", paidBankingOrderId)
                         .header("Authorization", bearer(adminToken)))
                 .andExpect(status().isOk())
@@ -247,6 +326,29 @@ class CriticalBusinessFlowTests {
                         .header("Authorization", bearer(customerToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("COMPLETED"));
+
+        // Historical names for one product must not create duplicate top-selling rows.
+        jdbcTemplate.update("""
+                UPDATE order_items
+                SET quantity = 1, sub_total = 2500.00, product_name_snapshot = ?
+                WHERE order_id = ?
+                """, "Older product name", codOrderId);
+        jdbcTemplate.update("""
+                INSERT INTO order_items (
+                    order_id, variant_id, product_name_snapshot, size_snapshot, color_snapshot,
+                    quantity, unit_price, sub_total
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """, codOrderId, variant.getId(), "Newer product name", "M", "Black",
+                1, new BigDecimal("2500.00"), new BigDecimal("2500.00"));
+
+        List<Object[]> topProducts = orders.findTopSellingProducts(
+                OrderStatus.COMPLETED, PageRequest.of(0, 10));
+        List<Object[]> matchingProductRows = topProducts.stream()
+                .filter(row -> ((Number) row[0]).longValue() == savedProduct.getId())
+                .toList();
+        assertThat(matchingProductRows).hasSize(1);
+        assertThat(((Number) matchingProductRows.get(0)[2]).longValue()).isEqualTo(2);
+        assertThat((BigDecimal) matchingProductRows.get(0)[3]).isEqualByComparingTo("5000.00");
     }
 
     private org.springframework.test.web.servlet.ResultActions addCartItem(

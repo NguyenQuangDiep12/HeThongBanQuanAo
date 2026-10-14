@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 @Component
 public class AdminBootstrap implements ApplicationRunner {
@@ -71,7 +72,7 @@ public class AdminBootstrap implements ApplicationRunner {
     }
 
     private String normalizeEmail(String email) {
-        return email.trim().toLowerCase();
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 
     private void validateExistingUser(User user) {

@@ -10,7 +10,7 @@ Tài liệu mô tả kiến trúc đang có của BLUE THREAD, một cửa hàng
 
 **Đã xác minh trong mã:** backend là Java 21 / Spring Boot 3.5.11 với Spring Web, Data JPA, Security, Validation, MySQL Connector/J và JJWT; dependency được khai báo trong `pom.xml`. Frontend khai báo React 19, React Router 7 và Vite 6 trong `frontend/package.json`. `frontend/vite.config.js` chạy frontend ở cổng 5199 và proxy `/api` tới `http://localhost:8082`.
 
-**Được tài liệu dự án xác nhận:** `src/BACKEND_SETUP.md` gọi backend là e-commerce mini backend, mô tả MySQL 8 và frontend là project riêng. Tài liệu đó nói Flyway áp dụng migration khi khởi động, nhưng cấu hình hiện tại trong `src/main/resources/application.properties` đặt `spring.flyway.enabled=false`; khi runtime dùng cấu hình này, Hibernate đặt `ddl-auto=update`. Vì vậy mặc định đã cấu hình trong source không chạy migration Flyway. Schema thực tế của môi trường triển khai chưa thể xác minh từ repo.
+**Được tài liệu dự án xác nhận:** `src/BACKEND_SETUP.md` gọi backend là e-commerce mini backend, mô tả MySQL 8 và frontend là project riêng. Tài liệu và `src/main/resources/application.properties` đều xác nhận Flyway hiện tắt, Hibernate dùng `ddl-auto=update`. Do đó source có các migration nhưng cấu hình mặc định đã commit không tự áp dụng chúng. Schema thực tế của môi trường triển khai chưa thể xác minh từ repo.
 
 ## Sơ đồ kiến trúc
 
@@ -24,11 +24,13 @@ flowchart LR
   SVC[Services: nghiệp vụ và transaction]
   REPO[Spring Data JPA repositories]
   DB[(MySQL-compatible relational database)]
+  GUARD[EnvironmentPostProcessor: production config guard]
   RUN[ApplicationRunner / CommandLineRunner]
 
   U --> FE --> API -->|HTTP /api, JSON| SEC
   SEC --> CTRL --> SVC --> REPO --> DB
   RUN --> REPO
+  GUARD -. validates env before context and datasource .-> API
   SVC -->|Order, payment, notification changes| REPO
 ```
 
@@ -62,7 +64,7 @@ Quy ước hình dạng use case, activity partitions/decision nodes, state tran
 | Backend | Java 21, Spring Boot 3.5.11, Spring Web MVC, Spring Data JPA, Spring Security, Jakarta Validation, Lombok | `pom.xml`, `src/main/java/com/project_shopping/shopee/` |
 | Xác thực | JWT qua JJWT 0.12.6, mật khẩu qua BCryptPasswordEncoder | `pom.xml`, `config/SecurityConfig.java`, `security/JwtService.java` |
 | Database | MySQL JDBC driver; URL local mặc định trỏ `localhost:3306/clotherwebsite`; test profile dùng H2 in-memory | `application.properties`, `src/test/resources/application-test.properties` |
-| Schema | JPA entity mapping; có Flyway scripts V1–V8 nhưng Flyway bị tắt trong application properties | `application.properties`, `db/migration/` |
+| Schema | JPA entity mapping; có Flyway scripts V1–V9 nhưng Flyway bị tắt trong application properties | `application.properties`, `db/migration/` |
 | Build backend | Maven Wrapper; Dockerfile build bằng Maven 3.9.9 / Eclipse Temurin 21, runtime JRE 21 | `pom.xml`, `mvnw.cmd`, `Dockerfile` |
 | Build frontend | npm scripts: `dev`, `build`, `preview`, `clean`; lockfile pnpm có trong sibling frontend | `frontend/package.json`, `frontend/pnpm-lock.yaml` |
 
@@ -100,12 +102,12 @@ Quy ước hình dạng use case, activity partitions/decision nodes, state tran
 - Không có service gọi cổng thanh toán trong dependencies hoặc backend source. BANKING hiện tạo hướng dẫn/nội dung chuyển khoản và chờ admin xác nhận; comment nhắc Univer Dashboard Sheet nhưng không có connector sheet trong code.
 - Kiểm tra role ở giao diện (`AppRoutes.jsx`) giúp điều hướng, còn quyền API được enforce ở backend `SecurityConfig`.
 - Tài liệu `frontend/UI_SPEC.md` mô tả một số luồng cũ: chưa nêu API hồ sơ, reviews, wishlist, trạng thái giao hàng đầy đủ và API thống kê, trong khi các phần này có trong source hiện tại. Khi có sai khác, tài liệu này ưu tiên source và ghi nhận lệch ở mục thông tin chưa xác định.
-- `BACKEND_SETUP.md` nói Flyway chạy lúc startup; `application.properties` tắt Flyway. V8 migration cũng có thể không phản ánh schema hiện hành nếu chỉ dùng cấu hình mặc định. Cần chốt chiến lược schema/migration trước khi thiết kế test repository dựa trên migration.
+- `application.properties` tắt Flyway và bật `ddl-auto=update`; SQL migrations V1–V9 vì vậy không được áp dụng tự động theo cấu hình mặc định. V9 bổ sung DDL tạo hai bảng thanh toán theo mapping entity, nhưng chưa đối chiếu với DB production. Chưa bật Flyway hoặc chuyển Hibernate sang `validate` cho đến khi xác nhận lịch sử schema và dữ liệu thật.
 
 ## Thông tin còn thiếu
 
 - Chưa có cấu hình/ảnh chụp database của production để khẳng định schema triển khai.
 - Chưa có hợp đồng ngoài hệ thống với Univer/Google Sheets; endpoint chỉ trả transaction rows và nhận thao tác xác nhận.
-- Chưa có test frontend hoặc test logic backend ngoài `ShopeeApplicationTests.contextLoads`; chưa xác định coverage hiện hữu ngoài source test được liệt kê.
+- Chưa có test frontend. Backend có `CriticalBusinessFlowTests`, `AdminBootstrapTest`, `ProductionConfigurationGuardTest` và `ShopeeApplicationTests`; coverage còn giới hạn, chưa bao phủ MySQL production hoặc mọi API.
 - Repo backend và source frontend là hai thư mục riêng; quan hệ version/commit giữa hai thư mục chưa xác minh.
 

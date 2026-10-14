@@ -72,6 +72,11 @@ public class AuthService {
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
 
+        if (request.password().getBytes(StandardCharsets.UTF_8).length > 72) {
+            passwords.matches("non-existent-account-dummy-password", dummyPasswordHash);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Email hoặc mật khẩu không chính xác.");
+        }
+
         var userRecord = users.findByEmailIgnoreCase(request.email().trim());
         if (userRecord.isEmpty()) {
             passwords.matches(request.password(), dummyPasswordHash);

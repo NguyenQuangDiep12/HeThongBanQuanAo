@@ -2,9 +2,9 @@
 
 ## Nguồn schema và cách diễn giải
 
-Entity JPA trong `src/main/java/com/project_shopping/shopee/model` là mô hình được ứng dụng map. SQL migrations V1–V8 trong `src/main/resources/db/migration` ghi lại các kiểu, khóa, index và thay đổi schema theo lịch sử. Tuy nhiên `src/main/resources/application.properties` hiện cấu hình `spring.flyway.enabled=false` cùng `spring.jpa.hibernate.ddl-auto=update`; vì vậy migrations không chạy theo cấu hình mặc định đã commit. Các bảng/kiểu MySQL dưới đây được xác minh từ SQL migration khi có migration tương ứng; nơi chỉ có mapping JPA, kiểu SQL chính xác là **suy ra theo dialect MySQL**, không có DDL migration trong repo.
+Entity JPA trong `src/main/java/com/project_shopping/shopee/model` là mô hình được ứng dụng map. SQL migrations V1–V9 trong `src/main/resources/db/migration` ghi lại các kiểu, khóa, index và thay đổi schema theo lịch sử. Tuy nhiên `src/main/resources/application.properties` hiện cấu hình `spring.flyway.enabled=false` cùng `spring.jpa.hibernate.ddl-auto=update`; vì vậy migrations không chạy theo cấu hình mặc định đã commit. Các bảng/kiểu MySQL dưới đây được xác minh từ SQL migration khi có migration tương ứng; nơi chỉ có mapping JPA, kiểu SQL chính xác là **suy ra theo dialect MySQL**.
 
-`src/BACKEND_SETUP.md` nói migrations được Flyway áp dụng và database production có thể là TiDB; nội dung này mâu thuẫn với property hiện hành và chưa được xác minh ở môi trường đang chạy. Test profile dùng H2 `MODE=MySQL`, `ddl-auto=create-drop`, Flyway off. Không có file dump/schema môi trường thật.
+`src/BACKEND_SETUP.md` và properties đều ghi Flyway tắt; production database thực tế và migration history chưa thể xác minh. Test profile dùng H2 `MODE=MySQL`, `ddl-auto=create-drop`, Flyway off. Không có file dump/schema môi trường thật.
 
 ## ERD
 
@@ -191,7 +191,7 @@ Nguồn: V8; entity `WishlistItem.java`.
 
 ### bank_accounts và payment_transactions
 
-Hai entity này map bảng `bank_accounts` và `payment_transactions`, nhưng không có migration V1–V8 tạo các bảng đó. Với Flyway tắt và `ddl-auto=update`, Hibernate có thể tạo/cập nhật chúng từ entity; SQL DDL chính xác cần xác minh từ DB/runtime.
+Hai entity này map bảng `bank_accounts` và `payment_transactions`. Migration V9 bổ sung DDL `CREATE TABLE IF NOT EXISTS` khớp tên/cột/độ dài/precision/quan hệ khai báo ở entity, nhưng Flyway vẫn tắt trong cấu hình mặc định và migration chưa được kiểm thử trên MySQL deployment. `transfer_memo` không có UNIQUE vì entity không khai báo và dữ liệu thật chưa được kiểm kê.
 
 | Bảng | Trường và kiểu Java/JPA | Ràng buộc đã khai báo |
 |---|---|---|
@@ -203,10 +203,11 @@ Hai entity này map bảng `bank_accounts` và `payment_transactions`, nhưng kh
 - Email duy nhất ở entity/schema; service trước tiên kiểm tra ignore-case, trong race vẫn có thể gặp unique violation.
 - Một cart/user, một cart-item/variant, một payment/order, một review/user-product và một wishlist/user-product.
 - Stock không âm và quantity trên cart/order item dương trong V1 DDL; request DTO còn kiểm tra quantity và variantId positive, variant stock nonnegative.
-- Order total, product/variant price có check dương trong V1; API DTO giới hạn giá tối thiểu 0.01.
+- Order total, product/variant price có check dương trong V1; API DTO giới hạn giá tối thiểu 0.01 và `@Digits(integer=10,fraction=2)` theo DECIMAL(12,2). Validator API `@WholeVndAmount` cho phép dạng biểu diễn có `.00` nhưng từ chối phần lẻ khác 0, vì luồng BANKING yêu cầu VND nguyên; đây là kiểm tra request, không phải CHECK constraint mới trong DB. `OrderService.checkout` chặn tổng vượt tối đa `999999999999.99` theo các cột DECIMAL(14,2) trước khi ghi đơn/trừ kho.
 - Product phụ thuộc category qua FK không nullable; nghiệp vụ chỉ cho tạo/cập nhật vào category active.
-- Order item giữ FK đến variant nên variant có thể không xóa được khi được dùng trong giỏ/đơn; service đổi lỗi delete sang 409.
-- PaymentTransaction status enum có REJECTED nhưng service hiện không có thao tác đặt trạng thái này.
+- Order item giữ FK đến variant nên variant có thể không xóa được khi được dùng trong giỏ/đơn; service đổi `DataIntegrityViolationException` khi delete sang 409.
+- PaymentTransaction status enum có REJECTED; hủy order chuyển transaction PENDING sang REJECTED.
+- Hủy order có Payment BANKING chuyển `Payment.paymentStatus` từ PENDING sang FAILED; xác nhận chuyển khoản hợp lệ chuyển sang PAID.
 - Không có ràng buộc database thể hiện order status transition, quyền sở hữu order, user role, category active hoặc điều kiện đã mua hàng; đó là guard trong service/security.
 
 ## Lịch sử migration và chênh lệch hiện hành
@@ -221,6 +222,7 @@ Hai entity này map bảng `bank_accounts` và `payment_transactions`, nhưng kh
 | V6 | Tạo product_reviews, rating check/unique/index | Chỉ chạy nếu bật Flyway |
 | V7 | Thêm users.active default true | Chỉ chạy nếu bật Flyway |
 | V8 | Tạo wishlist_items và unique/index | Chỉ chạy nếu bật Flyway |
+| V9 | Tạo `bank_accounts`, `payment_transactions` nếu chưa tồn tại; FK giao dịch tới orders và index theo order | Chỉ chạy nếu bật Flyway |
 
-**Chưa xác định:** trạng thái migration hiện tại của DB deployment, ràng buộc/index được sinh bởi Hibernate update, và liệu production có profile/property override bật Flyway hoặc tắt seeder không.
+**Chưa xác định:** trạng thái migration hiện tại của DB deployment, liệu hai bảng thanh toán đã được Hibernate tạo và có khớp V9 không, ràng buộc/index được sinh bởi Hibernate update, dữ liệu cũ và liệu production có profile/property override bật Flyway hoặc tắt seeder không. V9 chỉ chuẩn bị migration cho schema; chưa bật migration, `ddl-auto` vẫn là `update`. Không thêm unique index cho `transfer_memo` khi chưa đối chiếu schema/dữ liệu production.
 
