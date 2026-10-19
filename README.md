@@ -13,11 +13,16 @@ C:\DAAAN\shopee
 
 ## Chạy dự án
 
-Cần Java 21, MySQL 8, Node.js và pnpm. Tạo database `clotherwebsite`, sau đó mở PowerShell thứ nhất để chạy backend:
+Cần Java 21, Docker với MySQL 8, Node.js và pnpm. Khởi động MySQL container (nếu chưa chạy):
+
+```powershell
+docker run -d --name mysql-db -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root123 -e MYSQL_DATABASE=shopbanquanao -e MYSQL_USER=app_user -e MYSQL_PASSWORD=app123 mysql:8.0
+```
+
+Sau khi MySQL khởi động, mở PowerShell thứ nhất để chạy backend. Cấu hình dev mặc định đã trỏ tới database `shopbanquanao` và user `app_user`; đặt JWT secret và mật khẩu admin:
 
 ```powershell
 cd C:\DAAAN\shopee\shopee
-$env:DB_PASSWORD = "<mật khẩu MySQL>"
 $env:JWT_SECRET = "<chuỗi bí mật ngẫu nhiên tối thiểu 32 ký tự>"
 $env:ADMIN_PASSWORD = "<mật khẩu quản trị>"
 .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=dev"

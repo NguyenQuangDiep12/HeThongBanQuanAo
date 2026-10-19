@@ -10,14 +10,12 @@ Open a PowerShell window for the backend. The `dev` profile is local-only and en
 cd C:\DAAAN\shopee\shopee
 $env:JAVA_HOME = 'C:\OpenJDK21\jdk-21'
 $env:Path = "$env:JAVA_HOME\bin;$env:Path"
-$env:DB_USERNAME = 'root'
-$env:DB_PASSWORD = '<your-local-mysql-password>'
 $env:JWT_SECRET = '<a unique random secret of at least 32 bytes>'
 $env:ADMIN_PASSWORD = '<a unique password of at least 8 characters>'
 .\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-This starts only Spring Boot. Local database defaults come from `application-dev.properties`; `DB_PASSWORD`, `JWT_SECRET`, and `ADMIN_PASSWORD` must be supplied. Start MySQL and ensure the configured `clotherwebsite` database exists. The API fails to start if `JWT_SECRET` is missing or shorter than 32 bytes. Outside `dev`/`test`, an early `EnvironmentPostProcessor` validates a non-root database account, password, a JWT secret of at least 32 bytes, and a `DB_URL` query parameter `sslMode=VERIFY_IDENTITY` backed by a trusted certificate. `ADMIN_EMAIL` and `ADMIN_PASSWORD` are optional one-time bootstrap credentials and must be provided together when used. Configure these before deployment; do not activate the `dev` profile against production data.
+This starts only Spring Boot. Local database defaults come from `application-dev.properties` and match the Docker command above: database `shopbanquanao`, user `app_user`, password `app123`. Override them with `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` if needed. The API fails to start if `JWT_SECRET` is missing or shorter than 32 bytes. Outside `dev`/`test`, an early `EnvironmentPostProcessor` validates a non-root database account, password, a JWT secret of at least 32 bytes, and a `DB_URL` query parameter `sslMode=VERIFY_IDENTITY` backed by a trusted certificate. `ADMIN_EMAIL` and `ADMIN_PASSWORD` are optional one-time bootstrap credentials and must be provided together when used. Configure these before deployment; do not activate the `dev` profile against production data.
 
 At startup, `AdminBootstrap` creates the initial admin when that email does not already exist. In `dev`, the email defaults to `admin@local`; `ADMIN_PASSWORD` must be supplied. An existing admin's active state is preserved on restart.
 
