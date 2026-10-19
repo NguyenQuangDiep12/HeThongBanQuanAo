@@ -4,8 +4,6 @@
 
 **Đã xác minh trong mã** là hành vi thể hiện trực tiếp trong source. **Suy ra từ mã** là hệ quả của nhánh, transaction hoặc cấu hình và cần được giữ như giả thuyết kiểm thử đến khi test chứng minh. **Chưa xác định** là phần phụ thuộc môi trường hoặc hợp đồng không có trong repo. Tất cả endpoint và DTO được liệt kê ở `04-api-design.md`; tài liệu này tập trung vào trách nhiệm, kiểu đầu vào/đầu ra, nhánh nghiệp vụ và phụ thuộc.
 
-Các đường dẫn backend được tính từ thư mục `shopee/`; đường dẫn frontend bắt đầu bằng `frontend/`.
-
 ## 1. Khởi động và cấu hình
 
 ### ShopeeApplication

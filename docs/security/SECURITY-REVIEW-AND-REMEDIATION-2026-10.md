@@ -1,10 +1,8 @@
 # Báo cáo rà soát và khắc phục bảo mật
 
 Ngày rà soát: 15-10-2026  
-Phạm vi mã nguồn: backend Spring Boot trong `shopee/` và frontend React trong `frontend/`; frontend được rà cùng luồng thanh toán và các điểm chèn HTML.  
+Phạm vi mã nguồn: backend Spring Boot trong repository này; frontend được đọc để kiểm tra luồng thanh toán và các điểm chèn HTML nhưng không sửa vì nằm ngoài workspace có quyền ghi.  
 Mục đích: ghi lại lỗi có căn cứ từ mã nguồn, sửa lỗi phù hợp trong phạm vi repository, và nêu rõ các điều kiện còn thiếu trước khi xác nhận hệ thống production.
-
-Các đường dẫn backend trong báo cáo được tính từ thư mục `shopee/`.
 
 ## 1. Kết luận phạm vi
 
