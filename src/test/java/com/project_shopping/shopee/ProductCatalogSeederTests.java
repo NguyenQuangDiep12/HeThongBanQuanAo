@@ -50,11 +50,11 @@ class ProductCatalogSeederTests {
         Category clothing = categories.findByNameIgnoreCase("Quần áo").orElseThrow();
         Product firstItem = products
                 .findWithVariantsByNameIgnoreCaseAndCategory_Id(
-                        "Áo thun basic mẫu 01", clothing.getId())
+                        "Áo thun basic 01", clothing.getId())
                 .orElseThrow();
         assertThat(firstItem.getPrice()).isEqualByComparingTo(new BigDecimal("99000"));
         assertThat(firstItem.getImageUrl()).startsWith("https://images.unsplash.com/");
-        assertThat(firstItem.getDescription()).contains("GIẢ LẬP");
+        assertThat(firstItem.getDescription()).contains("Shopee");
         assertThat(firstItem.getVariants()).singleElement().satisfies(variant -> {
             assertThat(variant.getSize()).isEqualTo("S");
             assertThat(variant.getColor()).isEqualTo("Đen");
